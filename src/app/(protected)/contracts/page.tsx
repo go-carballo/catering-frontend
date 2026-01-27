@@ -37,7 +37,7 @@ import { useState } from "react";
 
 export default function ContractsPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { company } = useAuth();
   const { data: contracts, isLoading, error } = useContracts();
 
   const pauseMutation = usePauseContract();
@@ -49,9 +49,8 @@ export default function ContractsPage() {
     "pause" | "resume" | "terminate" | null
   >(null);
 
-  const isClient =
-    user?.role === "company_admin" || user?.role === "supervisor";
-  // For now, we show actions to company users. In a real app, we'd check companyType
+  // Client companies can manage contracts
+  const isClient = company?.companyType === "CLIENT";
 
   const handleAction = () => {
     if (!actionContract || !actionType) return;

@@ -16,4 +16,5 @@ export {
   formatDateParam,
 } from "./service-days.service";
 export { reportsService } from "./reports.service";
-export { companiesService } from "./companies.service";
+export { clientsService } from "./clients.service";
+export { cateringsService } from "./caterings.service";

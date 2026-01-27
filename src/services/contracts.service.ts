@@ -1,39 +1,46 @@
 import { apiGet, apiPost } from "./api";
-import type { Contract } from "@/types/contract";
+import type { Contract, CreateContractDto } from "@/types/contract";
 
 export const contractsService = {
   /**
    * Get all contracts for current user's company
    */
   async list(): Promise<Contract[]> {
-    return apiGet<Contract[]>("/api/contracts");
+    return apiGet<Contract[]>("/contracts");
   },
 
   /**
    * Get single contract by ID
    */
   async getById(id: string): Promise<Contract> {
-    return apiGet<Contract>(`/api/contracts/${id}`);
+    return apiGet<Contract>(`/contracts/${id}`);
+  },
+
+  /**
+   * Create a new contract
+   */
+  async create(dto: CreateContractDto): Promise<Contract> {
+    return apiPost<Contract>("/contracts", dto);
   },
 
   /**
    * Pause a contract (client only)
    */
   async pause(id: string): Promise<Contract> {
-    return apiPost<Contract>(`/api/contracts/${id}/pause`, {});
+    return apiPost<Contract>(`/contracts/${id}/pause`, {});
   },
 
   /**
    * Resume a contract (client only)
    */
   async resume(id: string): Promise<Contract> {
-    return apiPost<Contract>(`/api/contracts/${id}/resume`, {});
+    return apiPost<Contract>(`/contracts/${id}/resume`, {});
   },
 
   /**
    * Terminate a contract (client only)
    */
   async terminate(id: string): Promise<Contract> {
-    return apiPost<Contract>(`/api/contracts/${id}/terminate`, {});
+    return apiPost<Contract>(`/contracts/${id}/terminate`, {});
   },
 };

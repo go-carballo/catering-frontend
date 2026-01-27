@@ -25,7 +25,7 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { company, logout } = useAuth();
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
@@ -64,12 +64,12 @@ export function Sidebar() {
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
             <span className="text-sm font-medium text-primary">
-              {user?.name?.charAt(0).toUpperCase()}
+              {company?.name?.charAt(0).toUpperCase()}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{user?.name}</p>
-            <p className="text-xs text-gray-500 truncate">{user?.role}</p>
+            <p className="text-sm font-medium truncate">{company?.name}</p>
+            <p className="text-xs text-gray-500 truncate">{company?.companyType}</p>
           </div>
         </div>
         <Button

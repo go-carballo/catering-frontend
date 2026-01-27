@@ -3,11 +3,12 @@ import type {
   ServiceDay,
   ConfirmExpectedDto,
   ConfirmServedDto,
+  GenerateServiceDaysDto,
 } from "@/types/service-day";
 
 export interface ServiceDaysQuery {
-  from?: string; // YYYY-MM-DD
-  to?: string; // YYYY-MM-DD
+  from: string; // YYYY-MM-DD (required)
+  to: string; // YYYY-MM-DD (required)
 }
 
 export const serviceDaysService = {
@@ -16,42 +17,54 @@ export const serviceDaysService = {
    */
   async list(
     contractId: string,
-    query?: ServiceDaysQuery,
+    query: ServiceDaysQuery,
   ): Promise<ServiceDay[]> {
     const params = new URLSearchParams();
-    if (query?.from) params.set("from", query.from);
-    if (query?.to) params.set("to", query.to);
+    params.set("from", query.from);
+    params.set("to", query.to);
 
-    const queryString = params.toString();
-    const url = `/api/contracts/${contractId}/service-days${queryString ? `?${queryString}` : ""}`;
+    return apiGet<ServiceDay[]>(
+      `/contracts/${contractId}/service-days?${params.toString()}`,
+    );
+  },
 
-    return apiGet<ServiceDay[]>(url);
+  /**
+   * Generate service days for a contract
+   */
+  async generate(
+    contractId: string,
+    dto: GenerateServiceDaysDto,
+  ): Promise<ServiceDay[]> {
+    return apiPost<ServiceDay[]>(
+      `/contracts/${contractId}/service-days/generate`,
+      dto,
+    );
   },
 
   /**
    * Confirm expected quantity (client only)
+   * Note: endpoint is /service-days/:id, not nested under contracts
    */
   async confirmExpected(
-    contractId: string,
     serviceDayId: string,
     dto: ConfirmExpectedDto,
   ): Promise<ServiceDay> {
     return apiPost<ServiceDay>(
-      `/api/contracts/${contractId}/service-days/${serviceDayId}/confirm-expected`,
+      `/service-days/${serviceDayId}/confirm-expected`,
       dto,
     );
   },
 
   /**
    * Confirm served quantity (catering only)
+   * Note: endpoint is /service-days/:id, not nested under contracts
    */
   async confirmServed(
-    contractId: string,
     serviceDayId: string,
     dto: ConfirmServedDto,
   ): Promise<ServiceDay> {
     return apiPost<ServiceDay>(
-      `/api/contracts/${contractId}/service-days/${serviceDayId}/confirm-served`,
+      `/service-days/${serviceDayId}/confirm-served`,
       dto,
     );
   },

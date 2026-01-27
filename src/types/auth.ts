@@ -1,10 +1,11 @@
 // Auth types matching backend responses
-export interface User {
+export type CompanyType = "CATERING" | "CLIENT";
+
+export interface Company {
   id: string;
-  email: string;
   name: string;
-  role: "admin" | "company_admin" | "supervisor" | "operator";
-  companyId: string | null;
+  email: string;
+  companyType: CompanyType;
 }
 
 export interface LoginRequest {
@@ -13,12 +14,12 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  access_token: string;
-  user: User;
+  accessToken: string;
+  company: Company;
 }
 
 export interface AuthState {
-  user: User | null;
+  company: Company | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;

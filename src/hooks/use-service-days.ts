@@ -12,16 +12,15 @@ export const serviceDayKeys = {
     [...serviceDayKeys.all, "list", contractId, query] as const,
 };
 
-export function useServiceDays(contractId: string, query?: ServiceDaysQuery) {
+export function useServiceDays(contractId: string, query: ServiceDaysQuery) {
   return useQuery({
     queryKey: serviceDayKeys.list(contractId, query),
     queryFn: () => serviceDaysService.list(contractId, query),
-    enabled: !!contractId,
+    enabled: !!contractId && !!query.from && !!query.to,
   });
 }
 
 interface ConfirmExpectedParams {
-  contractId: string;
   serviceDayId: string;
   dto: ConfirmExpectedDto;
 }
@@ -33,8 +32,8 @@ export function useConfirmExpected(
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ contractId, serviceDayId, dto }: ConfirmExpectedParams) =>
-      serviceDaysService.confirmExpected(contractId, serviceDayId, dto),
+    mutationFn: ({ serviceDayId, dto }: ConfirmExpectedParams) =>
+      serviceDaysService.confirmExpected(serviceDayId, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: serviceDayKeys.list(contractId, query),
@@ -48,7 +47,6 @@ export function useConfirmExpected(
 }
 
 interface ConfirmServedParams {
-  contractId: string;
   serviceDayId: string;
   dto: ConfirmServedDto;
 }
@@ -57,8 +55,8 @@ export function useConfirmServed(contractId: string, query?: ServiceDaysQuery) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ contractId, serviceDayId, dto }: ConfirmServedParams) =>
-      serviceDaysService.confirmServed(contractId, serviceDayId, dto),
+    mutationFn: ({ serviceDayId, dto }: ConfirmServedParams) =>
+      serviceDaysService.confirmServed(serviceDayId, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: serviceDayKeys.list(contractId, query),

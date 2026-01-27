@@ -1,35 +1,31 @@
 import { apiPost, apiGet } from "./api";
-import type { LoginRequest, LoginResponse, User } from "@/types/auth";
+import type { LoginRequest, LoginResponse, Company } from "@/types/auth";
 
 export const authService = {
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const response = await apiPost<LoginResponse>("/auth/login", credentials);
 
-    // Store token and user
+    // Store token and company
     if (typeof window !== "undefined") {
-      localStorage.setItem("token", response.access_token);
-      localStorage.setItem("user", JSON.stringify(response.user));
+      localStorage.setItem("token", response.accessToken);
+      localStorage.setItem("company", JSON.stringify(response.company));
     }
 
     return response;
   },
 
-  async getProfile(): Promise<User> {
-    return apiGet<User>("/auth/profile");
-  },
-
   logout(): void {
     if (typeof window !== "undefined") {
       localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      localStorage.removeItem("company");
       window.location.href = "/login";
     }
   },
 
-  getStoredUser(): User | null {
+  getStoredCompany(): Company | null {
     if (typeof window === "undefined") return null;
-    const user = localStorage.getItem("user");
-    return user ? JSON.parse(user) : null;
+    const company = localStorage.getItem("company");
+    return company ? JSON.parse(company) : null;
   },
 
   getStoredToken(): string | null {

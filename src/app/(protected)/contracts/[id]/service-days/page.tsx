@@ -47,7 +47,7 @@ interface PageProps {
 export default function ServiceDaysPage({ params }: PageProps) {
   const { id: contractId } = use(params);
   const router = useRouter();
-  const { user } = useAuth();
+  const { company } = useAuth();
 
   // Week navigation state
   const [weekOffset, setWeekOffset] = useState(0);
@@ -73,8 +73,8 @@ export default function ServiceDaysPage({ params }: PageProps) {
   const [quantity, setQuantity] = useState("");
 
   // Determine user's company type from contract
-  const isClient = contract && user?.companyId === contract.clientCompanyId;
-  const isCatering = contract && user?.companyId === contract.cateringCompanyId;
+  const isClient = contract && company?.id === contract.clientCompanyId;
+  const isCatering = contract && company?.id === contract.cateringCompanyId;
 
   const openDialog = (day: ServiceDay, type: "expected" | "served") => {
     setSelectedDay(day);
@@ -104,9 +104,8 @@ export default function ServiceDaysPage({ params }: PageProps) {
     if (dialogType === "expected") {
       confirmExpected.mutate(
         {
-          contractId,
           serviceDayId: selectedDay.id,
-          dto: { quantity: qty },
+          dto: { expectedQuantity: qty },
         },
         {
           onSuccess: closeDialog,
@@ -115,9 +114,8 @@ export default function ServiceDaysPage({ params }: PageProps) {
     } else {
       confirmServed.mutate(
         {
-          contractId,
           serviceDayId: selectedDay.id,
-          dto: { quantity: qty },
+          dto: { servedQuantity: qty },
         },
         {
           onSuccess: closeDialog,

@@ -1,4 +1,4 @@
-import { apiGet, api } from "./api";
+import { apiGet } from "./api";
 import { env } from "@/config/env";
 
 export interface WeeklyReportEntry {
@@ -31,7 +31,7 @@ export const reportsService = {
     weekStart: string,
   ): Promise<WeeklyReport> {
     return apiGet<WeeklyReport>(
-      `/api/contracts/${contractId}/reports/weekly?weekStart=${weekStart}`,
+      `/contracts/${contractId}/reports/weekly?weekStart=${weekStart}`,
     );
   },
 
@@ -45,7 +45,7 @@ export const reportsService = {
   ): Promise<string> {
     const token =
       typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const url = `${env.API_URL}/api/contracts/${contractId}/reports/weekly/csv?weekStart=${weekStart}`;
+    const url = `${env.API_URL}/contracts/${contractId}/reports/weekly/csv?weekStart=${weekStart}`;
 
     const response = await fetch(url, {
       headers: {

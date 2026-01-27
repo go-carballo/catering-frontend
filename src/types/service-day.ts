@@ -14,11 +14,16 @@ export interface ServiceDay {
 }
 
 export interface ConfirmExpectedDto {
-  quantity: number;
+  expectedQuantity: number;
 }
 
 export interface ConfirmServedDto {
-  quantity: number;
+  servedQuantity: number;
+}
+
+export interface GenerateServiceDaysDto {
+  fromDate: string; // YYYY-MM-DD
+  toDate: string; // YYYY-MM-DD
 }
 
 // Status display

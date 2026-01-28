@@ -1,0 +1,64 @@
+# OpenCode AI Code Review
+# Revisión automática de código en Pull Requests
+# Usa las reglas definidas en AGENTS.md
+
+name: OpenCode Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  review:
+    # No ejecutar en PRs en draft
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+      issues: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run OpenCode Review
+        uses: anomalyco/opencode/github@latest
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          model: anthropic/claude-sonnet-4-20250514
+          use_github_token: true
+          prompt: |
+            Review this pull request following the rules in AGENTS.md.
+            
+            Focus on:
+            ## TypeScript & React
+            - Verify explicit types (no `any`)
+            - Check proper use of interfaces vs types
+            - Ensure functional components with hooks
+            - Validate `'use client'` directive usage
+            
+            ## Code Quality
+            - DRY principle compliance
+            - Single responsibility in functions/components
+            - Proper error handling in async operations
+            - Meaningful variable and function names
+            
+            ## Project Conventions
+            - File organization (components, hooks, services, types)
+            - Naming conventions (PascalCase components, camelCase hooks with `use` prefix)
+            - Tailwind CSS usage with `cn()` utility
+            - React Query for server state
+            
+            ## Security & Performance
+            - No sensitive data exposure
+            - Proper input validation
+            - Memoization where appropriate (useMemo, useCallback)
+            
+            Provide specific, actionable feedback with code examples when suggesting improvements.
+            Be constructive and explain the "why" behind each suggestion.

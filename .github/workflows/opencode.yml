@@ -1,0 +1,40 @@
+# OpenCode AI Agent - GitHub Integration
+# Permite usar /opencode o /oc en comentarios de issues y PRs
+# Docs: https://opencode.ai/docs/github/
+
+name: OpenCode Agent
+
+on:
+  # Comentarios en issues o PRs
+  issue_comment:
+    types: [created]
+  # Comentarios en líneas específicas de código en PRs
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  opencode:
+    # Solo ejecutar si el comentario contiene /oc o /opencode
+    if: |
+      contains(github.event.comment.body, '/oc') ||
+      contains(github.event.comment.body, '/opencode')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Run OpenCode
+        uses: anomalyco/opencode/github@latest
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        with:
+          model: anthropic/claude-sonnet-4-20250514
+          share: true

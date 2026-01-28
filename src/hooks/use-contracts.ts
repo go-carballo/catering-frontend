@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { contractsService } from "@/services/contracts.service";
+import type { CreateContractDto } from "@/types/contract";
 import { toast } from "sonner";
 
 export const contractKeys = {
@@ -67,6 +68,25 @@ export function useTerminateContract() {
     },
     onError: () => {
       toast.error("Error al terminar el contrato");
+    },
+  });
+}
+
+export function useCreateContract() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (dto: CreateContractDto) => contractsService.create(dto),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: contractKeys.list() });
+      queryClient.setQueryData(contractKeys.detail(data.id), data);
+      toast.success("Contrato creado exitosamente");
+    },
+    onError: (error: any) => {
+      // Extract backend error message if available
+      const message = error?.data?.message || error?.message || "Error desconocido";
+      toast.error(`Error al crear el contrato: ${message}`);
+      console.error("Create contract error:", error);
     },
   });
 }

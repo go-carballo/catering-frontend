@@ -11,5 +11,17 @@ export {
   useConfirmExpected,
   useConfirmServed,
 } from "./use-service-days";
-export { useCaterings, useCatering } from "./use-caterings";
-export { useClients, useClient } from "./use-clients";
+export {
+  useCaterings,
+  useCatering,
+  useCreateCatering,
+  useUpdateCatering,
+  useDeleteCatering,
+} from "./use-caterings";
+export {
+  useClients,
+  useClient,
+  useCreateClient,
+  useUpdateClient,
+  useDeleteClient,
+} from "./use-clients";

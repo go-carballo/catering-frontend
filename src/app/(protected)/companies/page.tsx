@@ -10,6 +10,7 @@ import {
   useDeleteClient,
 } from "@/hooks";
 import { CateringFormDialog } from "@/components/companies/catering-form-dialog";
+import { ClientFormDialog } from "@/components/companies/client-form-dialog";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -168,7 +169,7 @@ export default function CompaniesPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Empresas Cliente</CardTitle>
-              <Button disabled>Próximamente</Button>
+              <ClientFormDialog />
             </CardHeader>
             <CardContent>
               {isLoadingClients ? (
@@ -188,6 +189,7 @@ export default function CompaniesPage() {
                       <TableHead>CUIT</TableHead>
                       <TableHead>Modo de Trabajo</TableHead>
                       <TableHead className="text-center">Estado</TableHead>
+                      <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -215,6 +217,33 @@ export default function CompaniesPage() {
                           >
                             {client.isActive ? "Activo" : "Inactivo"}
                           </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex gap-2 justify-end">
+                            <ClientFormDialog
+                              client={client}
+                              trigger={
+                                <Button size="sm" variant="ghost">
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                              }
+                            />
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-red-600 hover:text-red-700"
+                              onClick={() =>
+                                setDeleteDialog({
+                                  open: true,
+                                  type: "client",
+                                  id: client.id,
+                                  name: client.name,
+                                })
+                              }
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

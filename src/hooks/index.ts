@@ -25,10 +25,3 @@ export {
   useUpdateClient,
   useDeleteClient,
 } from "./use-clients";
-export {
-  useUsers,
-  useUser,
-  useCreateUser,
-  useUpdateUser,
-  useDeleteUser,
-} from "./use-users";

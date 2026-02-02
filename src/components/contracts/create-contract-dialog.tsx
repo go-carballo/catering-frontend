@@ -47,7 +47,7 @@ export function CreateContractDialog() {
   const { data: caterings, isLoading: isLoadingCaterings } = useCaterings();
   const { data: clients, isLoading: isLoadingClients } = useClients();
 
-  const form = useForm<CreateContractFormData>({
+  const form = useForm({
     resolver: zodResolver(createContractSchema),
     defaultValues: {
       cateringCompanyId: "",

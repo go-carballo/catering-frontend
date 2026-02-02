@@ -17,8 +17,10 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, ArrowLeft, Download } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft, Download, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { generateWeeklyReportPDF } from "@/lib/pdf-generator";
+import { useAuth } from "@/providers";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -27,6 +29,7 @@ interface PageProps {
 export default function ReportsPage({ params }: PageProps) {
   const { id: contractId } = use(params);
   const router = useRouter();
+  const { company } = useAuth();
 
   // Week navigation state
   const [weekOffset, setWeekOffset] = useState(0);
@@ -50,6 +53,7 @@ export default function ReportsPage({ params }: PageProps) {
   });
 
   const [downloading, setDownloading] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   const handleDownloadCsv = async () => {
     setDownloading(true);
@@ -65,11 +69,36 @@ export default function ReportsPage({ params }: PageProps) {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(blobUrl);
-      toast.success("Reporte descargado");
+      toast.success("Reporte CSV descargado");
     } catch (err) {
-      toast.error("Error al descargar el reporte");
+      toast.error("Error al descargar el reporte CSV");
     } finally {
       setDownloading(false);
+    }
+  };
+
+  const handleDownloadPdf = () => {
+    if (!report || !contract || !company) {
+      toast.error("No hay datos para generar el PDF");
+      return;
+    }
+
+    if (!report.entries || report.entries.length === 0) {
+      toast.error("No hay servicios en este período para generar el reporte");
+      return;
+    }
+
+    setDownloadingPdf(true);
+    try {
+      const pdf = generateWeeklyReportPDF(report, contract, company.name);
+      pdf.save(`reporte-${contractId.slice(0, 8)}-${weekStart}.pdf`);
+      toast.success("Reporte PDF descargado");
+    } catch (err) {
+      console.error("Error generating PDF:", err);
+      const errorMessage = err instanceof Error ? err.message : "Error desconocido";
+      toast.error(`Error al generar el PDF: ${errorMessage}`);
+    } finally {
+      setDownloadingPdf(false);
     }
   };
 
@@ -117,10 +146,30 @@ export default function ReportsPage({ params }: PageProps) {
             {contract.pricePerService.toFixed(2)}/servicio
           </p>
         </div>
-        <Button onClick={handleDownloadCsv} disabled={downloading || !report}>
-          <Download className="h-4 w-4 mr-2" />
-          {downloading ? "Descargando..." : "Descargar CSV"}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleDownloadPdf}
+            disabled={
+              downloadingPdf ||
+              !report ||
+              !report.entries ||
+              report.entries.length === 0
+            }
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            {downloadingPdf ? "Generando..." : "Descargar PDF"}
+          </Button>
+          <Button
+            onClick={handleDownloadCsv}
+            disabled={
+              downloading || !report || !report.entries || report.entries.length === 0
+            }
+          >
+            <Download className="h-4 w-4 mr-2" />
+            {downloading ? "Descargando..." : "Descargar CSV"}
+          </Button>
+        </div>
       </div>
 
       {/* Week Navigator */}

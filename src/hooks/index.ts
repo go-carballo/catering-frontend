@@ -10,6 +10,8 @@ export {
   useServiceDays,
   useConfirmExpected,
   useConfirmServed,
+  useTodayServiceDays,
+  useAllServiceDays,
 } from "./use-service-days";
 export {
   useCaterings,

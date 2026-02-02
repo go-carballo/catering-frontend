@@ -10,7 +10,7 @@ export const createContractSchema = z.object({
     .number()
     .positive("El precio debe ser mayor a 0")
     .multipleOf(0.01, "El precio debe tener máximo 2 decimales"),
-  flexibleQuantity: z.boolean().optional().default(true),
+  flexibleQuantity: z.boolean().default(true),
   minDailyQuantity: z
     .number()
     .int("Debe ser un número entero")
@@ -53,8 +53,4 @@ export const createContractSchema = z.object({
   }
 );
 
-// Type for form input (before validation)
-export type CreateContractFormData = z.input<typeof createContractSchema>;
-
-// Type for validated output (after validation)
-export type CreateContractOutput = z.output<typeof createContractSchema>;
+export type CreateContractFormData = z.infer<typeof createContractSchema>;

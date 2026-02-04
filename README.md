@@ -80,8 +80,23 @@ Open [http://localhost:3001](http://localhost:3001) to see the app.
 
 ```bash
 # .env.local
-NEXT_PUBLIC_API_URL=http://localhost:8080/api
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ```
+
+### Test Credentials
+
+Use these credentials to login to the application:
+
+| Email                | Password    | Type     |
+|---------------------|-------------|----------|
+| delicias@example.com | password123 | CATERING |
+| sabores@example.com  | password123 | CATERING |
+| chef@example.com     | password123 | CATERING |
+| techcorp@example.com | password123 | CLIENT   |
+| finanzas@example.com | password123 | CLIENT   |
+| startup@example.com  | password123 | CLIENT   |
+
+**Note:** These credentials work with the seeded database. To seed the backend database, run `make seed` in the backend project or call the `/api/seed` endpoint.
 
 ---
 
@@ -133,6 +148,16 @@ gga install
 
 ---
 
+## 🌐 Deployment
+
+### Production
+
+- **Frontend:** [https://catering-frontend-two.vercel.app](https://catering-frontend-two.vercel.app)
+- **Backend API:** [https://catering-api-production.up.railway.app/api](https://catering-api-production.up.railway.app/api)
+- **API Docs (Swagger):** [https://catering-api-production.up.railway.app/docs](https://catering-api-production.up.railway.app/docs)
+
+---
+
 ## 📄 License
 
 MIT
@@ -142,5 +167,3 @@ MIT
 <p align="center">
   <sub>Built with ❤️ using Next.js and React</sub>
 </p>
-# Build 1770238843
-# Trigger 1770239780

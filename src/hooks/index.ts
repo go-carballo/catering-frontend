@@ -28,3 +28,8 @@ export {
   useUpdateClient,
   useDeleteClient,
 } from "./use-clients";
+export { useSessionTimeout } from "./use-session-timeout";
+export type {
+  UseSessionTimeoutOptions,
+  SessionTimeoutState,
+} from "./use-session-timeout";

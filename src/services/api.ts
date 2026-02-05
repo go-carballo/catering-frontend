@@ -24,12 +24,63 @@ function getToken(): string | null {
   return localStorage.getItem("token");
 }
 
+function getRefreshToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("refresh_token");
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = getRefreshToken();
+  if (!refreshToken) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${env.API_URL}/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!response.ok) {
+      // Refresh failed, clear tokens and redirect to login
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("company");
+        localStorage.removeItem("token_expiry");
+        window.location.href = "/login";
+      }
+      return null;
+    }
+
+    const data = await response.json();
+
+    // Update tokens in localStorage
+    if (typeof window !== "undefined") {
+      localStorage.setItem("token", data.accessToken);
+      localStorage.setItem("refresh_token", data.refreshToken);
+
+      // Update expiry time
+      const expiryTime = Date.now() + data.expiresIn * 1000;
+      localStorage.setItem("token_expiry", expiryTime.toString());
+    }
+
+    return data.accessToken;
+  } catch (error) {
+    console.error("Failed to refresh token:", error);
+    return null;
+  }
+}
+
 export async function api<T>(
   endpoint: string,
   options: RequestOptions = {},
 ): Promise<T> {
   const { method = "GET", body, headers = {} } = options;
-  const token = getToken();
+  let token = getToken();
 
   const config: RequestInit = {
     method,
@@ -45,16 +96,23 @@ export async function api<T>(
   }
 
   const url = `${env.API_URL}${endpoint}`;
-  const response = await fetch(url, config);
+  let response = await fetch(url, config);
 
-  // Handle 401 - redirect to login
+  // Handle 401 - try to refresh token
   if (response.status === 401) {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/login";
+    const newToken = await refreshAccessToken();
+
+    if (newToken) {
+      // Retry request with new token
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${newToken}`,
+      };
+      response = await fetch(url, config);
+    } else {
+      // Refresh failed, redirect to login (already done in refreshAccessToken)
+      throw new ApiError(401, "Unauthorized");
     }
-    throw new ApiError(401, "Unauthorized");
   }
 
   // Handle non-2xx responses

@@ -15,12 +15,19 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
   company: Company;
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
 }
 
 export interface AuthState {
   company: Company | null;
   token: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 }

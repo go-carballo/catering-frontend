@@ -6,6 +6,7 @@ export {
   useTerminateContract,
   useCreateContract,
 } from "./use-contracts";
+export { useFinanceMetrics } from "./use-finance-metrics";
 export {
   useServiceDays,
   useConfirmExpected,

@@ -1,5 +1,6 @@
 import { apiGet, apiPost } from "./api";
 import type { Contract, CreateContractDto } from "@/types/contract";
+import type { FinanceMetrics } from "@/types/finance-metrics";
 
 export const contractsService = {
   /**
@@ -42,5 +43,12 @@ export const contractsService = {
    */
   async terminate(id: string): Promise<Contract> {
     return apiPost<Contract>(`/contracts/${id}/terminate`, {});
+  },
+
+  /**
+   * Get finance metrics (client only)
+   */
+  async getFinanceMetrics(): Promise<FinanceMetrics> {
+    return apiGet<FinanceMetrics>("/contracts/finance-metrics");
   },
 };

@@ -3,293 +3,141 @@
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers";
-import {
-  useContracts,
-  useCaterings,
-  useClients,
-  useTodayServiceDays,
-} from "@/hooks";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  FileText,
-  Calendar,
-  Building2,
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-} from "lucide-react";
+import { useFinanceMetrics } from "@/hooks";
+import { BudgetCard } from "@/components/dashboard/budget-card";
+import { KPIsGrid } from "@/components/dashboard/kpis-grid";
+import { RecentServicesTable } from "@/components/dashboard/recent-services-table";
+import { DeviationAlert } from "@/components/dashboard/deviation-alert";
+import { EmptyState } from "@/components/dashboard/empty-state";
+import { ErrorState } from "@/components/dashboard/error-state";
+import { DashboardLoadingSkeleton } from "@/components/dashboard/loading-skeleton";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { company } = useAuth();
+  const { data: financeData, isLoading, error } = useFinanceMetrics();
 
-  // Fetch data
-  const { data: contracts, isLoading: contractsLoading } = useContracts();
-  const { data: caterings, isLoading: cateringsLoading } = useCaterings();
-  const { data: clients, isLoading: clientsLoading } = useClients();
-  const { data: todayServices, isLoading: servicesLoading } =
-    useTodayServiceDays(contracts);
+  // Calculate derived metrics for budget analysis
+  const budgetMetrics = useMemo(() => {
+    if (!financeData) return null;
 
-  // Calculate metrics
-  const metrics = useMemo(() => {
-    if (!contracts) return null;
-
-    const activeContracts = contracts.filter((c) => c.status === "ACTIVE");
-    const pausedContracts = contracts.filter((c) => c.status === "PAUSED");
-    const totalCompanies = (caterings?.length || 0) + (clients?.length || 0);
-    const pendingServices = todayServices?.filter(
-      (s) => s.status === "PENDING",
-    ).length || 0;
-    const confirmedServices = todayServices?.filter(
-      (s) => s.status === "CONFIRMED",
-    ).length || 0;
+    const { budget } = financeData;
+    const budgetPercentage =
+      budget.estimated > 0 ? (budget.consumed / budget.estimated) * 100 : 0;
+    const savingsVsPrevious = budget.previousMonth - budget.consumed;
+    const savingsPercentage =
+      budget.previousMonth > 0
+        ? (savingsVsPrevious / budget.previousMonth) * 100
+        : 0;
+    const isOverBudget =
+      budget.estimated > 0 && budget.projectedEndOfMonth > budget.estimated;
 
     return {
-      activeContracts: activeContracts.length,
-      pausedContracts: pausedContracts.length,
-      totalCompanies,
-      pendingServices,
-      confirmedServices,
-      totalServicesForToday: todayServices?.length || 0,
+      budgetPercentage,
+      savingsVsPrevious,
+      savingsPercentage,
+      isOverBudget,
     };
-  }, [contracts, caterings, clients, todayServices]);
+  }, [financeData]);
 
-  const isLoading =
-    contractsLoading || cateringsLoading || clientsLoading || servicesLoading;
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("es-AR", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-    });
-  };
-
+  // Handle loading state
   if (isLoading) {
+    return <DashboardLoadingSkeleton />;
+  }
+
+  // Handle error state
+  if (error) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+      <ErrorState
+        title="Error al cargar métricas"
+        description="No se pudieron obtener los datos financieros. Por favor, intenta más tarde."
+        actionLabel="Reintentar"
+        onAction={() => window.location.reload()}
+      />
+    );
+  }
+
+  // Validate data exists
+  if (!financeData || !budgetMetrics) {
+    return null;
+  }
+
+  const { budget, kpis, recentServices } = financeData;
+  const hasNoData =
+    budget.consumed === 0 &&
+    budget.estimated === 0 &&
+    recentServices.length === 0;
+
+  // Handle empty state - no contracts
+  if (hasNoData) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">
+            Gestión de Beneficio Corporativo
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Control financiero y auditoría de servicios de catering
+          </p>
+        </div>
+
+        <EmptyState
+          title="No hay contratos activos"
+          description="Comenzá creando tu primer contrato para gestionar servicios de catering y llevar el control de tus operaciones."
+          actionLabel="+ Crear Primer Contrato"
+          onAction={() => router.push("/contracts")}
+        />
       </div>
     );
   }
 
+  // Main dashboard view with data
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-gray-500">
-          Bienvenido, {company?.name} -{" "}
-          {company?.companyType === "CATERING" ? "Catering" : "Cliente"}
+        <h1 className="text-2xl font-bold text-slate-900">
+          Gestión de Beneficio Corporativo
+        </h1>
+        <p className="text-sm text-slate-500 mt-1">
+          Control financiero y auditoría de servicios de catering
         </p>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Contratos Activos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics?.activeContracts ?? "-"}
-            </div>
-            {metrics && metrics.pausedContracts > 0 && (
-              <p className="text-xs text-gray-500 mt-1">
-                {metrics.pausedContracts} pausados
-              </p>
-            )}
-          </CardContent>
-        </Card>
+      {/* Budget Card - Hero Section */}
+      <BudgetCard
+        budget={budget}
+        budgetPercentage={budgetMetrics.budgetPercentage}
+        projectedPercentage={0} // Not used in current design
+        savingsVsPrevious={budgetMetrics.savingsVsPrevious}
+        savingsPercentage={budgetMetrics.savingsPercentage}
+        isOverBudget={budgetMetrics.isOverBudget}
+      />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Servicios Hoy
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics?.totalServicesForToday ?? "-"}
-            </div>
-            {metrics && metrics.totalServicesForToday > 0 && (
-              <p className="text-xs text-gray-500 mt-1">
-                {metrics.pendingServices} pendientes
-              </p>
-            )}
-          </CardContent>
-        </Card>
+      {/* KPIs Grid */}
+      <KPIsGrid kpis={kpis} />
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
-              <Building2 className="h-4 w-4" />
-              Empresas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics?.totalCompanies ?? "-"}
-            </div>
-            {metrics && (
-              <p className="text-xs text-gray-500 mt-1">
-                {caterings?.length || 0} caterings, {clients?.length || 0}{" "}
-                clientes
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4" />
-              Confirmados Hoy
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {metrics?.confirmedServices ?? "-"}
-            </div>
-            {metrics && metrics.totalServicesForToday > 0 && (
-              <p className="text-xs text-gray-500 mt-1">
-                de {metrics.totalServicesForToday} totales
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Today's Services */}
-      {todayServices && todayServices.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Servicios de Hoy
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Contrato</TableHead>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead className="text-center">Esperado</TableHead>
-                  <TableHead className="text-center">Servido</TableHead>
-                  <TableHead className="text-center">Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {todayServices.map((service) => (
-                  <TableRow key={service.id}>
-                    <TableCell className="font-mono text-sm">
-                      {service.contractId.slice(0, 8)}...
-                    </TableCell>
-                    <TableCell>{formatDate(service.serviceDate)}</TableCell>
-                    <TableCell className="text-center">
-                      {service.expectedQuantity ?? "-"}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {service.servedQuantity ?? "-"}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge
-                        className={
-                          service.status === "CONFIRMED"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }
-                      >
-                        {service.status === "CONFIRMED"
-                          ? "Confirmado"
-                          : "Pendiente"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          router.push(
-                            `/contracts/${service.contractId}/service-days`,
-                          )
-                        }
-                      >
-                        Ver Detalles
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+      {/* Deviation Alert - Only show if there are deviations */}
+      {kpis.contractsWithDeviation > 0 && (
+        <DeviationAlert
+          count={kpis.contractsWithDeviation}
+          onViewContracts={() => router.push("/contracts")}
+        />
       )}
 
-      {/* Paused Contracts Alert */}
-      {metrics && metrics.pausedContracts > 0 && (
-        <Card className="border-yellow-200 bg-yellow-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-yellow-800">
-              <AlertCircle className="h-5 w-5" />
-              Contratos que Requieren Atención
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-yellow-700">
-              Tenés {metrics.pausedContracts} contrato(s) pausado(s). Revisalos
-              para reactivarlos o gestionarlos según sea necesario.
-            </p>
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={() => router.push("/contracts")}
-            >
-              Ver Contratos
-            </Button>
-          </CardContent>
-        </Card>
+      {/* Recent Services Table */}
+      {recentServices.length > 0 && (
+        <RecentServicesTable
+          services={recentServices}
+          onViewDetails={(contractId) => {
+            if (contractId === "all") {
+              router.push("/service-days");
+            } else {
+              router.push(`/contracts/${contractId}/service-days`);
+            }
+          }}
+        />
       )}
-
-      {/* Empty State */}
-      {metrics &&
-        metrics.activeContracts === 0 &&
-        metrics.pausedContracts === 0 && (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center py-12">
-                <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  No hay contratos activos
-                </h3>
-                <p className="text-gray-500 mb-4">
-                  Comenzá creando tu primer contrato para gestionar servicios de
-                  catering.
-                </p>
-                <Button onClick={() => router.push("/contracts")}>
-                  Crear Contrato
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
     </div>
   );
 }

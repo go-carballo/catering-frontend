@@ -17,6 +17,7 @@ import {
 } from "@/services/service-days.service";
 import { serviceDayStatusDisplay } from "@/types/service-day";
 import type { ServiceDay } from "@/types/service-day";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 
 import {
   Table,
@@ -38,7 +39,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, ArrowLeft, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft, Check, DollarSign, Users } from "lucide-react";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -170,258 +171,361 @@ export default function ServiceDaysPage({ params }: PageProps) {
     year: "numeric",
   });
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => router.push("/contracts")}
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Volver
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold">Servicios del Contrato</h1>
-          <p className="text-gray-500">
-            {contract.minDailyQuantity} - {contract.maxDailyQuantity}{" "}
-            servicios/día | ${contract.pricePerService.toFixed(2)}/servicio
-          </p>
-        </div>
-      </div>
+   return (
+     <div className="space-y-6">
+       <Breadcrumbs />
+       
+       {/* Header */}
+       <div className="space-y-4">
+         <Button
+           variant="ghost"
+           size="sm"
+           onClick={() => router.push("/contracts")}
+           className="text-slate-600 hover:text-slate-900"
+         >
+           <ArrowLeft className="h-4 w-4 mr-1" />
+           Volver a Contratos
+         </Button>
+         
+         <div className="space-y-2">
+           <h1 className="text-3xl font-bold text-slate-900">Servicios del Contrato</h1>
+           <p className="text-slate-600 max-w-2xl">
+             Gestiona los días de servicio de este contrato. Confirma cantidades esperadas (cliente) 
+             y servidas (catering) para cada día.
+           </p>
+         </div>
 
-      {/* Week Navigator */}
-      <Card>
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Semana del {weekLabel}</CardTitle>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setWeekOffset((w) => w - 1)}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Anterior
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setWeekOffset(0)}
-                disabled={weekOffset === 0}
-              >
-                Hoy
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setWeekOffset((w) => w + 1)}
-              >
-                Siguiente
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {serviceDays && serviceDays.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No hay días de servicio para esta semana
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead className="text-center">Esperado</TableHead>
-                  <TableHead className="text-center">Servido</TableHead>
-                  <TableHead className="text-center">Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {serviceDays?.map((day) => (
-                  <TableRow key={day.id}>
-                    <TableCell className="font-medium">
-                      {formatDate(day.serviceDate)}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {day.expectedQuantity !== null ? (
-                        <span className="font-semibold">
-                          {day.expectedQuantity}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                      {day.expectedConfirmedAt && (
-                        <Check className="h-4 w-4 inline ml-1 text-green-600" />
-                      )}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {day.servedQuantity !== null ? (
-                        <span className="font-semibold">
-                          {day.servedQuantity}
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                      {day.servedConfirmedAt && (
-                        <Check className="h-4 w-4 inline ml-1 text-green-600" />
-                      )}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <Badge
-                        className={serviceDayStatusDisplay[day.status].color}
-                      >
-                        {serviceDayStatusDisplay[day.status].label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex gap-2 justify-end">
-                        {canConfirmExpected(day) && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openDialog(day, "expected")}
-                          >
-                            Confirmar Esperado
-                          </Button>
-                        )}
-                        {canConfirmServed(day) && (
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={() => openDialog(day, "served")}
-                          >
-                            Confirmar Servido
-                          </Button>
-                        )}
-                        {day.status === "CONFIRMED" && (
-                          <span className="text-sm text-gray-500 italic">
-                            Completado
-                          </span>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+         {/* Contract Details Cards */}
+         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+             <p className="text-xs text-blue-600 font-semibold mb-1">📊 CANTIDAD DIARIA</p>
+             <p className="text-lg font-bold text-slate-900">
+               {contract.minDailyQuantity} - {contract.maxDailyQuantity}
+             </p>
+             <p className="text-xs text-slate-600 mt-1">Rango de servicios por día</p>
+           </div>
+           
+           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+             <p className="text-xs text-green-600 font-semibold mb-1">💰 PRECIO POR SERVICIO</p>
+             <p className="text-lg font-bold text-slate-900">
+               ${contract.pricePerService.toFixed(2)}
+             </p>
+             <p className="text-xs text-slate-600 mt-1">Costo unitario</p>
+           </div>
 
-      {/* Summary */}
-      {serviceDays && serviceDays.length > 0 && (
-        <div className="grid grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-gray-500">
-                Total Esperado
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">
-                {serviceDays.reduce(
-                  (sum, d) => sum + (d.expectedQuantity || 0),
-                  0,
-                )}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-gray-500">
-                Total Servido
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">
-                {serviceDays.reduce(
-                  (sum, d) => sum + (d.servedQuantity || 0),
-                  0,
-                )}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-gray-500">
-                Confirmados
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">
-                {serviceDays.filter((d) => d.status === "CONFIRMED").length} /{" "}
-                {serviceDays.length}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+           <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+             <p className="text-xs text-purple-600 font-semibold mb-1">📅 DÍAS DE SERVICIO</p>
+             <p className="text-lg font-bold text-slate-900">
+               {contract.serviceDays.length}
+             </p>
+             <p className="text-xs text-slate-600 mt-1">
+               {contract.serviceDays.sort().join(", ").substring(0, 20)}...
+             </p>
+           </div>
+         </div>
+       </div>
 
-      {/* Confirm Dialog */}
-      <Dialog open={!!selectedDay} onOpenChange={() => closeDialog()}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {dialogType === "expected"
-                ? "Confirmar Cantidad Esperada"
-                : "Confirmar Cantidad Servida"}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedDay && (
-                <>
-                  Fecha: {formatDate(selectedDay.serviceDate)}
-                  <br />
-                  {dialogType === "expected" && contract && (
-                    <>
-                      Rango permitido: {contract.minDailyQuantity} -{" "}
-                      {contract.maxDailyQuantity}
-                    </>
-                  )}
-                  {dialogType === "served" && selectedDay.expectedQuantity && (
-                    <>Cantidad esperada: {selectedDay.expectedQuantity}</>
-                  )}
-                </>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-            <Input
-              type="number"
-              min={dialogType === "expected" ? contract?.minDailyQuantity : 0}
-              max={
-                dialogType === "expected"
-                  ? contract?.maxDailyQuantity
-                  : undefined
-              }
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              placeholder="Cantidad"
-              className="text-lg"
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={closeDialog}>
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleConfirm}
-              disabled={
-                !quantity ||
-                confirmExpected.isPending ||
-                confirmServed.isPending
-              }
-            >
-              {confirmExpected.isPending || confirmServed.isPending
-                ? "Guardando..."
-                : "Confirmar"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+       {/* Week Navigator */}
+       <Card>
+         <CardHeader className="pb-3">
+           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+             <div>
+               <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                 📅 Semana del {weekLabel}
+               </CardTitle>
+               <p className="text-sm text-slate-500 mt-1">
+                 Haz clic en los botones para navegar entre semanas
+               </p>
+             </div>
+             <div className="flex gap-2">
+               <Button
+                 variant="outline"
+                 size="sm"
+                 onClick={() => setWeekOffset((w) => w - 1)}
+                 className="hover:bg-blue-50"
+               >
+                 <ChevronLeft className="h-4 w-4 mr-1" />
+                 Anterior
+               </Button>
+               <Button
+                 variant={weekOffset === 0 ? "default" : "outline"}
+                 size="sm"
+                 onClick={() => setWeekOffset(0)}
+                 className={weekOffset === 0 ? "bg-blue-600 hover:bg-blue-700" : "hover:bg-blue-50"}
+               >
+                 Hoy
+               </Button>
+               <Button
+                 variant="outline"
+                 size="sm"
+                 onClick={() => setWeekOffset((w) => w + 1)}
+                 className="hover:bg-blue-50"
+               >
+                 Siguiente
+                 <ChevronRight className="h-4 w-4 ml-1" />
+               </Button>
+             </div>
+           </div>
+         </CardHeader>
+         <CardContent>
+           {serviceDays && serviceDays.length === 0 ? (
+             <div className="text-center py-12 text-slate-500">
+               <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+               <p className="text-lg font-semibold text-slate-900">No hay servicios esta semana</p>
+               <p className="text-sm mt-1">Intenta navegar a otra semana</p>
+             </div>
+           ) : (
+             <Table>
+               <TableHeader>
+                 <TableRow>
+                   <TableHead>📅 Fecha</TableHead>
+                   <TableHead className="text-center">👥 Esperado</TableHead>
+                   <TableHead className="text-center">✅ Servido</TableHead>
+                   <TableHead className="text-center">Estado</TableHead>
+                   <TableHead className="text-right">Acciones</TableHead>
+                 </TableRow>
+               </TableHeader>
+               <TableBody>
+                 {serviceDays?.map((day) => (
+                   <TableRow key={day.id} className="hover:bg-blue-50">
+                     <TableCell className="font-medium text-slate-900">
+                       {formatDate(day.serviceDate)}
+                     </TableCell>
+                     <TableCell className="text-center">
+                       <div className="font-semibold text-slate-900">
+                         {day.expectedQuantity !== null ? (
+                           <span>
+                             {day.expectedQuantity}
+                             {day.expectedConfirmedAt && (
+                               <Check className="h-4 w-4 inline ml-2 text-green-600 align-baseline" />
+                             )}
+                           </span>
+                         ) : (
+                           <span className="text-slate-400">-</span>
+                         )}
+                       </div>
+                       {day.expectedQuantity === null && (
+                         <p className="text-xs text-yellow-600 mt-1">Sin confirmar</p>
+                       )}
+                     </TableCell>
+                     <TableCell className="text-center">
+                       <div className="font-semibold text-slate-900">
+                         {day.servedQuantity !== null ? (
+                           <span>
+                             {day.servedQuantity}
+                             {day.servedConfirmedAt && (
+                               <Check className="h-4 w-4 inline ml-2 text-green-600 align-baseline" />
+                             )}
+                           </span>
+                         ) : (
+                           <span className="text-slate-400">-</span>
+                         )}
+                       </div>
+                       {day.servedQuantity === null && (
+                         <p className="text-xs text-yellow-600 mt-1">Sin confirmar</p>
+                       )}
+                     </TableCell>
+                     <TableCell className="text-center">
+                       <Badge
+                         className={serviceDayStatusDisplay[day.status].color}
+                       >
+                         {serviceDayStatusDisplay[day.status].label}
+                       </Badge>
+                     </TableCell>
+                     <TableCell className="text-right">
+                       <div className="flex gap-1.5 justify-end">
+                         {canConfirmExpected(day) && (
+                           <Button
+                             variant="outline"
+                             size="sm"
+                             onClick={() => openDialog(day, "expected")}
+                             className="hover:bg-blue-50 text-xs"
+                             title="Confirma la cantidad esperada de servicios"
+                           >
+                             Cantidad Esperada
+                           </Button>
+                         )}
+                         {canConfirmServed(day) && (
+                           <Button
+                             variant="default"
+                             size="sm"
+                             onClick={() => openDialog(day, "served")}
+                             className="bg-blue-600 hover:bg-blue-700 text-xs"
+                             title="Confirma la cantidad realmente servida"
+                           >
+                             Cantidad Servida
+                           </Button>
+                         )}
+                         {day.status === "CONFIRMED" && (
+                           <span className="text-xs text-green-600 font-semibold px-2 py-1">
+                             ✓ Completado
+                           </span>
+                         )}
+                       </div>
+                     </TableCell>
+                   </TableRow>
+                 ))}
+               </TableBody>
+             </Table>
+           )}
+         </CardContent>
+       </Card>
+
+       {/* Summary */}
+       {serviceDays && serviceDays.length > 0 && (
+         <div>
+           <div className="mb-4">
+             <h2 className="text-lg font-semibold text-slate-900">Resumen de la Semana</h2>
+             <p className="text-sm text-slate-500 mt-1">Totales de servicios para el período mostrado</p>
+           </div>
+           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+             <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-yellow-400">
+               <CardHeader className="pb-2">
+                 <CardTitle className="text-sm text-slate-600 flex items-center gap-2">
+                   <Users className="h-4 w-4 text-yellow-600" />
+                   Total Esperado
+                 </CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <p className="text-3xl font-bold text-slate-900">
+                   {serviceDays.reduce(
+                     (sum, d) => sum + (d.expectedQuantity || 0),
+                     0,
+                   )}
+                 </p>
+                 <p className="text-xs text-slate-500 mt-2">Personas a servir esta semana</p>
+               </CardContent>
+             </Card>
+             
+             <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-green-400">
+               <CardHeader className="pb-2">
+                 <CardTitle className="text-sm text-slate-600 flex items-center gap-2">
+                   <Check className="h-4 w-4 text-green-600" />
+                   Total Servido
+                 </CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <p className="text-3xl font-bold text-slate-900">
+                   {serviceDays.reduce(
+                     (sum, d) => sum + (d.servedQuantity || 0),
+                     0,
+                   )}
+                 </p>
+                 <p className="text-xs text-slate-500 mt-2">Personas ya servidas</p>
+               </CardContent>
+             </Card>
+             
+             <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-blue-400">
+               <CardHeader className="pb-2">
+                 <CardTitle className="text-sm text-slate-600">
+                   Días Confirmados
+                 </CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <p className="text-3xl font-bold text-slate-900">
+                   {serviceDays.filter((d) => d.status === "CONFIRMED").length} /{" "}
+                   {serviceDays.length}
+                 </p>
+                 <p className="text-xs text-slate-500 mt-2">
+                   {serviceDays.length === serviceDays.filter((d) => d.status === "CONFIRMED").length
+                     ? "✓ Todos confirmados"
+                     : "Aún por confirmar"}
+                 </p>
+               </CardContent>
+             </Card>
+           </div>
+         </div>
+       )}
+
+       {/* Confirm Dialog */}
+       <Dialog open={!!selectedDay} onOpenChange={() => closeDialog()}>
+         <DialogContent className="max-w-md">
+           <DialogHeader>
+             <DialogTitle className="text-lg">
+               {dialogType === "expected"
+                 ? "✍️ Confirmar Cantidad Esperada"
+                 : "✅ Confirmar Cantidad Servida"}
+             </DialogTitle>
+             <DialogDescription>
+               {selectedDay && (
+                 <div className="mt-4 space-y-3">
+                   <div>
+                     <p className="text-xs text-slate-500 font-semibold">FECHA</p>
+                     <p className="text-sm font-medium text-slate-900 mt-1">
+                       📅 {formatDate(selectedDay.serviceDate)}
+                     </p>
+                   </div>
+                   
+                   {dialogType === "expected" && contract && (
+                     <div>
+                       <p className="text-xs text-slate-500 font-semibold">RANGO PERMITIDO</p>
+                       <p className="text-sm font-medium text-slate-900 mt-1">
+                         👥 {contract.minDailyQuantity} - {contract.maxDailyQuantity} servicios
+                       </p>
+                       <p className="text-xs text-slate-500 mt-1">
+                         Confirma la cantidad esperada dentro de este rango
+                       </p>
+                     </div>
+                   )}
+                   
+                   {dialogType === "served" && selectedDay.expectedQuantity && (
+                     <div>
+                       <p className="text-xs text-slate-500 font-semibold">CANTIDAD ESPERADA</p>
+                       <p className="text-sm font-medium text-slate-900 mt-1">
+                         👥 {selectedDay.expectedQuantity} servicios
+                       </p>
+                       <p className="text-xs text-slate-500 mt-1">
+                         Confirma la cantidad realmente servida
+                       </p>
+                     </div>
+                   )}
+                 </div>
+               )}
+             </DialogDescription>
+           </DialogHeader>
+           <div className="py-4 space-y-2">
+             <label className="text-sm font-semibold text-slate-900">
+               Cantidad a Confirmar
+             </label>
+             <Input
+               type="number"
+               min={dialogType === "expected" ? contract?.minDailyQuantity : 0}
+               max={
+                 dialogType === "expected"
+                   ? contract?.maxDailyQuantity
+                   : undefined
+               }
+               value={quantity}
+               onChange={(e) => setQuantity(e.target.value)}
+               placeholder="Ingresa la cantidad"
+               className="text-lg font-medium bg-white border-slate-300"
+             />
+             <p className="text-xs text-slate-500 mt-2">
+               {dialogType === "expected"
+                 ? `Rango: ${contract?.minDailyQuantity} - ${contract?.maxDailyQuantity}`
+                 : "Ingresa la cantidad servida realmente"}
+             </p>
+           </div>
+           <DialogFooter className="gap-2">
+             <Button variant="outline" onClick={closeDialog} className="flex-1">
+               Cancelar
+             </Button>
+             <Button
+               onClick={handleConfirm}
+               disabled={
+                 !quantity ||
+                 confirmExpected.isPending ||
+                 confirmServed.isPending
+               }
+               className="flex-1 bg-blue-600 hover:bg-blue-700"
+             >
+               {confirmExpected.isPending || confirmServed.isPending
+                 ? "Guardando..."
+                 : "Confirmar"}
+             </Button>
+           </DialogFooter>
+         </DialogContent>
+       </Dialog>
     </div>
   );
 }

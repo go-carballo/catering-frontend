@@ -95,20 +95,20 @@ export function CateringFormDialog({ catering, trigger }: CateringFormDialogProp
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button size={isEdit ? "sm" : "default"} variant={isEdit ? "ghost" : "default"}>
-            {isEdit ? (
-              <Pencil className="h-4 w-4" />
-            ) : (
-              <>
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Catering
-              </>
-            )}
-          </Button>
-        )}
-      </DialogTrigger>
+       <DialogTrigger asChild>
+         {trigger || (
+           <Button size={isEdit ? "sm" : "default"} variant={isEdit ? "ghost" : "default"}>
+             {isEdit ? (
+               <Pencil className="h-4 w-4" />
+             ) : (
+               <>
+                 <Plus className="h-4 w-4" />
+                 Nuevo Catering
+               </>
+             )}
+           </Button>
+         )}
+       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>

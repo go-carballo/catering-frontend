@@ -124,18 +124,18 @@ export function ClientFormDialog({ client, trigger }: ClientFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger || (
-          <Button size={isEdit ? "sm" : "default"} variant={isEdit ? "ghost" : "default"}>
-            {isEdit ? (
-              <Pencil className="h-4 w-4" />
-            ) : (
-              <>
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Cliente
-              </>
-            )}
-          </Button>
-        )}
+         {trigger || (
+           <Button size={isEdit ? "sm" : "default"} variant={isEdit ? "ghost" : "default"}>
+             {isEdit ? (
+               <Pencil className="h-4 w-4" />
+             ) : (
+               <>
+                 <Plus className="h-4 w-4" />
+                 Nuevo Cliente
+               </>
+             )}
+           </Button>
+         )}
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>

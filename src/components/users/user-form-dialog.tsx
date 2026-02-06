@@ -108,8 +108,8 @@ export function UserFormDialog({ user, trigger }: UserFormDialogProps) {
         {trigger ? (
           trigger
         ) : (
-          <Button variant="default" size="sm">
-            <Plus className="w-4 h-4 mr-2" />
+          <Button variant="default" size="default">
+            <Plus className="w-4 h-4" />
             Nuevo Usuario
           </Button>
         )}

@@ -193,11 +193,12 @@ export default function ContractsPage() {
                         </Button>
                       )}
 
-                      {contract.status !== "TERMINATED" && (
+                      {isClient && contract.status !== "TERMINATED" && (
                         <Button
                           variant="destructive"
                           size="sm"
                           onClick={() => openAction(contract, "terminate")}
+                          title="Solo el cliente puede terminar contratos"
                         >
                           <XCircle className="h-4 w-4" />
                         </Button>

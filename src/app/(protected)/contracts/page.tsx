@@ -125,7 +125,7 @@ export default function ContractsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {contracts?.map((contract) => (
+              {contracts?.filter(contract => contract.status !== "TERMINATED").map((contract) => (
                 <TableRow key={contract.id}>
                   <TableCell className="font-mono text-sm">
                     {contract.id.slice(0, 8)}...

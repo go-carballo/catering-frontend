@@ -10,6 +10,7 @@ import {
 import { serviceDayStatusDisplay } from "@/types/service-day";
 import type { ServiceDay, ServiceDayStatus } from "@/types/service-day";
 import type { Contract } from "@/types/contract";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -161,9 +162,10 @@ export default function ServiceDaysPage() {
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
+   return (
+     <div className="space-y-6">
+       <Breadcrumbs />
+       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Servicios</h1>
         <p className="text-gray-500">

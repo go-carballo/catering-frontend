@@ -11,6 +11,7 @@ import {
 } from "@/hooks";
 import { CateringFormDialog } from "@/components/companies/catering-form-dialog";
 import { ClientFormDialog } from "@/components/companies/client-form-dialog";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -65,9 +66,10 @@ export default function CompaniesPage() {
     setDeleteDialog({ open: false, type: null, id: null, name: null });
   };
 
-  return (
-    <div className="space-y-6">
-      <div>
+   return (
+     <div className="space-y-6">
+       <Breadcrumbs />
+       <div>
         <h1 className="text-3xl font-bold">Empresas</h1>
         <p className="text-gray-500">Gestión de empresas de catering y clientes</p>
       </div>

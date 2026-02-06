@@ -10,6 +10,7 @@ import {
 import { useAuth } from "@/providers";
 import { statusDisplay, dayNames } from "@/types/contract";
 import type { Contract } from "@/types/contract";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 
 import {
   Table,
@@ -95,9 +96,10 @@ export default function ContractsPage() {
     );
   }
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+   return (
+     <div className="space-y-6">
+       <Breadcrumbs />
+       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Contratos</h1>
           <p className="text-gray-500">Gestiona los contratos de tu empresa</p>

@@ -100,12 +100,12 @@ export default function ContractsPage() {
      <div className="space-y-6">
        <Breadcrumbs />
        <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Contratos</h1>
-          <p className="text-gray-500">Gestiona los contratos de tu empresa</p>
-        </div>
-        <CreateContractDialog />
-      </div>
+         <div>
+           <h1 className="text-3xl font-bold">Contratos</h1>
+           <p className="text-gray-500">Gestiona los contratos de tu empresa</p>
+         </div>
+         {isClient && <CreateContractDialog />}
+       </div>
 
       {contracts && contracts.length === 0 ? (
         <div className="text-center py-12 text-gray-500">

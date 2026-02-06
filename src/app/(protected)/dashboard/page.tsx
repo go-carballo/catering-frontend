@@ -12,12 +12,24 @@ import { DeviationAlert } from "@/components/dashboard/deviation-alert";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { ErrorState } from "@/components/dashboard/error-state";
 import { DashboardLoadingSkeleton } from "@/components/dashboard/loading-skeleton";
+import { CateringHome } from "@/components/dashboard/catering-home";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { company } = useAuth();
   const { data: financeData, isLoading, error } = useFinanceMetrics();
 
+  // Show catering home for CATERING companies
+  if (company?.companyType === "CATERING") {
+    return (
+      <div className="space-y-6">
+        <Breadcrumbs />
+        <CateringHome />
+      </div>
+    );
+  }
+
+  // CLIENT dashboard - financial focused
   // Calculate derived metrics for budget analysis
   const budgetMetrics = useMemo(() => {
     if (!financeData) return null;
@@ -69,12 +81,12 @@ export default function DashboardPage() {
     budget.estimated === 0 &&
     recentServices.length === 0;
 
-   // Handle empty state - no contracts
-   if (hasNoData) {
-     return (
-       <div className="space-y-6">
-         <Breadcrumbs />
-         <div>
+  // Handle empty state - no contracts
+  if (hasNoData) {
+    return (
+      <div className="space-y-6">
+        <Breadcrumbs />
+        <div>
           <h1 className="text-2xl font-bold text-slate-900">
             Gestión de Beneficio Corporativo
           </h1>
@@ -93,11 +105,11 @@ export default function DashboardPage() {
     );
   }
 
-   // Main dashboard view with data
-   return (
-     <div className="space-y-6">
-       <Breadcrumbs />
-       {/* Header */}
+  // Main dashboard view with data
+  return (
+    <div className="space-y-6">
+      <Breadcrumbs />
+      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-900">
           Gestión de Beneficio Corporativo

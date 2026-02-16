@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,17 +28,21 @@ import {
 
 const resetPasswordSchema = z
   .object({
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    passwordConfirmation: z.string().min(1, "Please confirm your password"),
+    password: z
+      .string()
+      .min(8, "La contraseña debe tener al menos 8 caracteres"),
+    passwordConfirmation: z
+      .string()
+      .min(1, "Por favor confirma tu contraseña"),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
-    message: "Passwords do not match",
+    message: "Las contraseñas no coinciden",
     path: ["passwordConfirmation"],
   });
 
-type ResetPasswordForm = z.infer<typeof resetPasswordSchema>;
+type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("token");
@@ -46,7 +50,7 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const form = useForm<ResetPasswordForm>({
+  const form = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       password: "",
@@ -56,12 +60,12 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     if (!token) {
-      toast.error("Invalid reset link");
+      toast.error("Enlace de recuperación inválido");
       router.push("/login");
     }
   }, [token, router]);
 
-  async function onSubmit(data: ResetPasswordForm) {
+  async function onSubmit(data: ResetPasswordFormData) {
     if (!token) return;
 
     setIsLoading(true);
@@ -71,21 +75,26 @@ export default function ResetPasswordPage() {
         password: data.password,
       });
 
-      toast.success("Password reset successful! You can now login.");
+      toast.success("¡Contraseña restablecida! Ya podés iniciar sesión.");
       setIsSuccess(true);
 
-      // Redirect to login after 2 seconds
       setTimeout(() => {
         router.push("/login");
       }, 2000);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Error desconocido";
       console.error("Reset password error:", error);
 
-      if (error.message.includes("400")) {
-        toast.error("Reset link has expired. Please request a new one.");
+      if (message.includes("400")) {
+        toast.error(
+          "El enlace de recuperación expiró. Solicitá uno nuevo.",
+        );
         router.push("/forgot-password");
       } else {
-        toast.error("Failed to reset password. Please try again.");
+        toast.error(
+          "No se pudo restablecer la contraseña. Intentá nuevamente.",
+        );
       }
     } finally {
       setIsLoading(false);
@@ -97,14 +106,14 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Invalid Reset Link</CardTitle>
+            <CardTitle>Enlace inválido</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600 mb-4">
-              This reset link is invalid or has expired.
+              Este enlace de recuperación es inválido o expiró.
             </p>
             <Button className="w-full" asChild>
-              <a href="/forgot-password">Request a new reset link</a>
+              <a href="/forgot-password">Solicitar nuevo enlace</a>
             </Button>
           </CardContent>
         </Card>
@@ -117,14 +126,16 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Password Reset!</CardTitle>
+            <CardTitle className="text-2xl">
+              ¡Contraseña restablecida!
+            </CardTitle>
             <CardDescription>
-              Your password has been successfully reset.
+              Tu contraseña fue actualizada correctamente.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600">
-              Redirecting to login page...
+              Redirigiendo a la página de inicio de sesión...
             </p>
           </CardContent>
         </Card>
@@ -136,9 +147,9 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Reset Password</CardTitle>
+          <CardTitle className="text-2xl">Restablecer Contraseña</CardTitle>
           <CardDescription>
-            Enter your new password. Minimum 8 characters.
+            Ingresá tu nueva contraseña. Mínimo 8 caracteres.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -149,7 +160,7 @@ export default function ResetPasswordPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>New Password</FormLabel>
+                    <FormLabel>Nueva Contraseña</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
@@ -169,7 +180,7 @@ export default function ResetPasswordPage() {
                 name="passwordConfirmation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel>Confirmar Contraseña</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
@@ -185,12 +196,26 @@ export default function ResetPasswordPage() {
               />
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Resetting..." : "Reset Password"}
+                {isLoading ? "Restableciendo..." : "Restablecer Contraseña"}
               </Button>
             </form>
           </Form>
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+        </div>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

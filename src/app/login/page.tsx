@@ -9,6 +9,7 @@ import { z } from "zod";
 import { useAuth } from "@/providers";
 import { toast } from "sonner";
 import { Users, UtensilsCrossed } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,14 +32,19 @@ import {
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(1, "La contraseña es requerida"),
-  rememberMe: z.boolean().default(false),
 });
 
-type LoginForm = z.infer<typeof loginSchema>;
+type LoginFormData = z.infer<typeof loginSchema>;
 
-type AccountType = "client" | "catering" | null;
+type AccountType = "client" | "catering";
 
-const accountDescriptions = {
+interface AccountDescription {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+}
+
+const accountDescriptions: Record<AccountType, AccountDescription> = {
   client: {
     title: "Cliente",
     description:
@@ -53,13 +59,84 @@ const accountDescriptions = {
   },
 };
 
-export default function LoginPage() {
+// ── Account Type Selector ──────────────────────────────────────────
+
+function AccountTypeSelector({
+  onSelect,
+}: {
+  onSelect: (type: AccountType) => void;
+}) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white px-4">
+      <div className="w-full max-w-2xl space-y-8">
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold text-slate-900">Catering App</h1>
+          <p className="text-slate-600">¿Cuál es tu rol en la plataforma?</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {(["client", "catering"] as const).map((type) => {
+            const Icon = accountDescriptions[type].icon;
+            return (
+              <button
+                key={type}
+                onClick={() => onSelect(type)}
+                className="group relative rounded-lg border-2 border-slate-200 p-6 text-left transition-all hover:border-teal-600 hover:shadow-lg"
+              >
+                <div className="space-y-4">
+                  <div className="inline-block p-3 rounded-lg bg-teal-50 group-hover:bg-teal-100 transition">
+                    <Icon className="h-6 w-6 text-teal-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900">
+                      {accountDescriptions[type].title}
+                    </h3>
+                    <p className="text-sm text-slate-600 mt-1">
+                      {accountDescriptions[type].description}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center gap-2 text-teal-600 font-medium">
+                  Continuar
+                  <span className="group-hover:translate-x-1 transition">
+                    →
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="text-center">
+          <Link
+            href="/"
+            className="text-sm text-slate-600 hover:text-slate-900"
+          >
+            ← Volver al inicio
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Login Form ────────────────────────────────────────────────────
+
+function LoginForm({
+  accountType,
+  onBack,
+}: {
+  accountType: AccountType;
+  onBack: () => void;
+}) {
   const router = useRouter();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [accountType, setAccountType] = useState<AccountType>(null);
 
-  const form = useForm<LoginForm>({
+  const description = accountDescriptions[accountType];
+  const Icon = description.icon;
+
+  const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -67,7 +144,7 @@ export default function LoginPage() {
     },
   });
 
-  async function onSubmit(data: LoginForm) {
+  async function onSubmit(data: LoginFormData) {
     setIsLoading(true);
     try {
       await login(data);
@@ -81,80 +158,16 @@ export default function LoginPage() {
     }
   }
 
-  // Step 1: Select account type
-  if (!accountType) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white px-4">
-        <div className="w-full max-w-2xl space-y-8">
-          {/* Header */}
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold text-slate-900">Catering App</h1>
-            <p className="text-slate-600">
-              ¿Cuál es tu rol en la plataforma?
-            </p>
-          </div>
-
-          {/* Account Type Selection */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {(["client", "catering"] as AccountType[]).map((type) => {
-              const Icon = accountDescriptions[type].icon;
-              return (
-                <button
-                  key={type}
-                  onClick={() => setAccountType(type)}
-                  className="group relative rounded-lg border-2 border-slate-200 p-6 text-left transition-all hover:border-teal-600 hover:shadow-lg"
-                >
-                  <div className="space-y-4">
-                    <div className="inline-block p-3 rounded-lg bg-teal-50 group-hover:bg-teal-100 transition">
-                      <Icon className="h-6 w-6 text-teal-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        {accountDescriptions[type].title}
-                      </h3>
-                      <p className="text-sm text-slate-600 mt-1">
-                        {accountDescriptions[type].description}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex items-center gap-2 text-teal-600 font-medium">
-                    Continuar
-                    <span className="group-hover:translate-x-1 transition">
-                      →
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Back to landing */}
-          <div className="text-center">
-            <Link href="/" className="text-sm text-slate-600 hover:text-slate-900">
-              ← Volver al inicio
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Step 2: Login form
-  const description = accountDescriptions[accountType];
-  const Icon = description.icon;
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 to-white px-4">
       <div className="w-full max-w-md space-y-4">
-        {/* Back button */}
         <button
-          onClick={() => setAccountType(null)}
+          onClick={onBack}
           className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1"
         >
           ← Cambiar tipo de cuenta
         </button>
 
-        {/* Card */}
         <Card>
           <CardHeader className="text-center">
             <div className="flex justify-center mb-3">
@@ -234,27 +247,46 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        {/* Test Credentials */}
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="pt-6">
-            <p className="text-xs font-semibold text-blue-900 mb-2">
-              CREDENCIALES DE PRUEBA:
-            </p>
-            {accountType === "client" && (
-              <div className="text-xs text-blue-800 space-y-1">
-                <p>Email: techcorp@example.com</p>
-                <p>Password: password123</p>
-              </div>
-            )}
-            {accountType === "catering" && (
-              <div className="text-xs text-blue-800 space-y-1">
-                <p>Email: delicias@example.com</p>
-                <p>Password: password123</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {/* Test Credentials — only visible in development */}
+        {process.env.NODE_ENV === "development" && (
+          <Card className="bg-blue-50 border-blue-200">
+            <CardContent className="pt-6">
+              <p className="text-xs font-semibold text-blue-900 mb-2">
+                CREDENCIALES DE PRUEBA:
+              </p>
+              {accountType === "client" && (
+                <div className="text-xs text-blue-800 space-y-1">
+                  <p>Email: techcorp@example.com</p>
+                  <p>Password: password123</p>
+                </div>
+              )}
+              {accountType === "catering" && (
+                <div className="text-xs text-blue-800 space-y-1">
+                  <p>Email: delicias@example.com</p>
+                  <p>Password: password123</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
+  );
+}
+
+// ── Page Component ────────────────────────────────────────────────
+
+export default function LoginPage() {
+  const [accountType, setAccountType] = useState<AccountType | null>(null);
+
+  if (!accountType) {
+    return <AccountTypeSelector onSelect={setAccountType} />;
+  }
+
+  return (
+    <LoginForm
+      accountType={accountType}
+      onBack={() => setAccountType(null)}
+    />
   );
 }

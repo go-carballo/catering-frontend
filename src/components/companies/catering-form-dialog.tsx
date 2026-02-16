@@ -1,18 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Pencil } from "lucide-react";
 
 import {
   createCateringSchema,
   updateCateringSchema,
-  type CreateCateringFormData,
-  type UpdateCateringFormData,
+  type CateringFormData,
 } from "@/lib/validations/catering";
 import { useCreateCatering, useUpdateCatering } from "@/hooks";
-import type { Catering } from "@/services/caterings.service";
+import type { Catering, CreateCateringDto } from "@/services/caterings.service";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -47,8 +46,8 @@ export function CateringFormDialog({ catering, trigger }: CateringFormDialogProp
   const createMutation = useCreateCatering();
   const updateMutation = useUpdateCatering();
 
-  const form = useForm<CreateCateringFormData | UpdateCateringFormData>({
-    resolver: zodResolver(isEdit ? updateCateringSchema : createCateringSchema),
+  const form = useForm<CateringFormData>({
+    resolver: zodResolver(isEdit ? updateCateringSchema : createCateringSchema) as Resolver<CateringFormData>,
     defaultValues: isEdit
       ? {
           name: catering.name,
@@ -74,20 +73,20 @@ export function CateringFormDialog({ catering, trigger }: CateringFormDialogProp
     }
   }, [open, catering, form]);
 
-  const onSubmit = async (data: CreateCateringFormData | UpdateCateringFormData) => {
+  const onSubmit = async (data: CateringFormData) => {
     try {
       if (isEdit) {
         await updateMutation.mutateAsync({
           id: catering.id,
-          dto: data as UpdateCateringFormData,
+          dto: data,
         });
       } else {
-        await createMutation.mutateAsync(data as CreateCateringFormData);
+        await createMutation.mutateAsync(data as CreateCateringDto);
       }
       setOpen(false);
       form.reset();
     } catch (error) {
-      // Error already handled by mutation
+      console.error("Catering form submission error:", error);
     }
   };
 
@@ -124,7 +123,6 @@ export function CateringFormDialog({ catering, trigger }: CateringFormDialogProp
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
-              // @ts-ignore
               control={form.control}
               name="name"
               render={({ field }) => (
@@ -141,7 +139,6 @@ export function CateringFormDialog({ catering, trigger }: CateringFormDialogProp
             {!isEdit && (
               <>
                 <FormField
-                  // @ts-ignore
                   control={form.control}
                   name="email"
                   render={({ field }) => (
@@ -160,7 +157,6 @@ export function CateringFormDialog({ catering, trigger }: CateringFormDialogProp
                 />
 
                 <FormField
-                  // @ts-ignore
                   control={form.control}
                   name="password"
                   render={({ field }) => (
@@ -180,7 +176,6 @@ export function CateringFormDialog({ catering, trigger }: CateringFormDialogProp
             )}
 
             <FormField
-              // @ts-ignore
               control={form.control}
               name="taxId"
               render={({ field }) => (
@@ -195,7 +190,6 @@ export function CateringFormDialog({ catering, trigger }: CateringFormDialogProp
             />
 
             <FormField
-              // @ts-ignore
               control={form.control}
               name="dailyCapacity"
               render={({ field }) => (

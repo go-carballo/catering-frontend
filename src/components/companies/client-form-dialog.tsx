@@ -1,18 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Pencil } from "lucide-react";
 
 import {
   createClientSchema,
   updateClientSchema,
-  type CreateClientFormData,
-  type UpdateClientFormData,
+  type ClientFormData,
 } from "@/lib/validations/client";
 import { useCreateClient, useUpdateClient } from "@/hooks";
-import type { Client, WorkMode, DayOfWeek } from "@/services/clients.service";
+import type { Client, CreateClientDto, WorkMode, DayOfWeek } from "@/services/clients.service";
 import { dayNames } from "@/types/contract";
 
 import { Button } from "@/components/ui/button";
@@ -72,8 +71,8 @@ export function ClientFormDialog({ client, trigger }: ClientFormDialogProps) {
   const createMutation = useCreateClient();
   const updateMutation = useUpdateClient();
 
-  const form = useForm<CreateClientFormData | UpdateClientFormData>({
-    resolver: zodResolver(isEdit ? updateClientSchema : createClientSchema),
+  const form = useForm<ClientFormData>({
+    resolver: zodResolver(isEdit ? updateClientSchema : createClientSchema) as Resolver<ClientFormData>,
     defaultValues: isEdit
       ? {
           name: client.name,
@@ -102,7 +101,7 @@ export function ClientFormDialog({ client, trigger }: ClientFormDialogProps) {
     }
   }, [open, client, form]);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: ClientFormData) => {
     try {
       if (isEdit) {
         await updateMutation.mutateAsync({
@@ -110,12 +109,12 @@ export function ClientFormDialog({ client, trigger }: ClientFormDialogProps) {
           dto: data,
         });
       } else {
-        await createMutation.mutateAsync(data);
+        await createMutation.mutateAsync(data as CreateClientDto);
       }
       setOpen(false);
       form.reset();
     } catch (error) {
-      // Error already handled by mutation
+      console.error("Client form submission error:", error);
     }
   };
 
@@ -153,7 +152,6 @@ export function ClientFormDialog({ client, trigger }: ClientFormDialogProps) {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Name */}
             <FormField
-              // @ts-ignore
               control={form.control}
               name="name"
               render={({ field }) => (
@@ -171,7 +169,6 @@ export function ClientFormDialog({ client, trigger }: ClientFormDialogProps) {
             {!isEdit && (
               <div className="grid grid-cols-2 gap-4">
                 <FormField
-                  // @ts-ignore
                   control={form.control}
                   name="email"
                   render={({ field }) => (
@@ -190,7 +187,6 @@ export function ClientFormDialog({ client, trigger }: ClientFormDialogProps) {
                 />
 
                 <FormField
-                  // @ts-ignore
                   control={form.control}
                   name="password"
                   render={({ field }) => (
@@ -209,7 +205,6 @@ export function ClientFormDialog({ client, trigger }: ClientFormDialogProps) {
 
             {/* Tax ID */}
             <FormField
-              // @ts-ignore
               control={form.control}
               name="taxId"
               render={({ field }) => (
@@ -225,7 +220,6 @@ export function ClientFormDialog({ client, trigger }: ClientFormDialogProps) {
 
             {/* Work Mode */}
             <FormField
-              // @ts-ignore
               control={form.control}
               name="workMode"
               render={({ field }) => (
@@ -255,7 +249,6 @@ export function ClientFormDialog({ client, trigger }: ClientFormDialogProps) {
 
             {/* Office Days */}
             <FormField
-              // @ts-ignore
               control={form.control}
               name="officeDays"
               render={() => (
@@ -270,7 +263,6 @@ export function ClientFormDialog({ client, trigger }: ClientFormDialogProps) {
                     {officeDaysOptions.map((day) => (
                       <FormField
                         key={day.value}
-                        // @ts-ignore
                         control={form.control}
                         name="officeDays"
                         render={({ field }) => {

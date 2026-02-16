@@ -23,3 +23,16 @@ export const updateCateringSchema = z.object({
 
 export type CreateCateringFormData = z.infer<typeof createCateringSchema>;
 export type UpdateCateringFormData = z.infer<typeof updateCateringSchema>;
+
+/**
+ * Unified form data type for the catering form dialog.
+ * Create-only fields (email, password) are marked optional so the same
+ * type works for both create and edit modes with react-hook-form generics.
+ */
+export type CateringFormData = {
+  name: string;
+  email?: string;
+  password?: string;
+  taxId?: string;
+  dailyCapacity: number;
+};

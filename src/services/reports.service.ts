@@ -1,4 +1,5 @@
 import { apiGet } from "./api";
+import { authService } from "./auth.service";
 import { env } from "@/config/env";
 
 export interface WeeklyReportEntry {
@@ -36,15 +37,17 @@ export const reportsService = {
   },
 
   /**
-   * Download CSV report
-   * Returns blob URL for download
+   * Download CSV report.
+   *
+   * NOTE: This uses raw fetch because we need the response as a Blob,
+   * not JSON. But we still use authService for token access to avoid
+   * duplicating token retrieval logic.
    */
   async downloadWeeklyCsv(
     contractId: string,
     weekStart: string,
   ): Promise<string> {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = authService.getStoredToken();
     const url = `${env.API_URL}/contracts/${contractId}/reports/weekly/csv?weekStart=${weekStart}`;
 
     const response = await fetch(url, {
@@ -54,6 +57,20 @@ export const reportsService = {
     });
 
     if (!response.ok) {
+      // If 401, try refreshing and retry once
+      if (response.status === 401) {
+        const newToken = await authService.refreshToken();
+        if (newToken) {
+          const retryResponse = await fetch(url, {
+            headers: { Authorization: `Bearer ${newToken}` },
+          });
+          if (!retryResponse.ok) {
+            throw new Error("Failed to download report");
+          }
+          const blob = await retryResponse.blob();
+          return URL.createObjectURL(blob);
+        }
+      }
       throw new Error("Failed to download report");
     }
 

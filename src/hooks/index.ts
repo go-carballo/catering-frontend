@@ -40,3 +40,4 @@ export type {
   UseSessionTimeoutOptions,
   SessionTimeoutState,
 } from "./use-session-timeout";
+export { useAuth } from "@/providers/auth-provider";

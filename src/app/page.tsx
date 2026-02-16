@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +9,112 @@ import {
   CheckCircle,
   ArrowRight,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
+interface Feature {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+}
+
+function FeatureGrid({ features }: { features: Feature[] }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {features.map((feature) => (
+        <Card
+          key={feature.title}
+          className="hover:shadow-lg transition-shadow duration-300"
+        >
+          <CardHeader>
+            <feature.icon className="h-8 w-8 text-teal-600 mb-2" />
+            <CardTitle className="text-lg">{feature.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-slate-600">{feature.description}</p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+const clientFeatures: Feature[] = [
+  {
+    icon: Calendar,
+    title: "Contratación Flexible",
+    description:
+      "Define días de servicio, cantidades y precios personalizados para cada contrato.",
+  },
+  {
+    icon: CheckCircle,
+    title: "Confirmaciones Dual",
+    description:
+      "Confirma cantidades esperadas y controlá lo que realmente se sirve.",
+  },
+  {
+    icon: BarChart3,
+    title: "Reportes Financieros",
+    description:
+      "Dashboard con presupuesto, gastos, KPIs y proyecciones precisas.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Análisis de Desviaciones",
+    description:
+      "Identifica diferencias entre lo presupuestado y lo consumido.",
+  },
+  {
+    icon: Users,
+    title: "Gestión de Usuarios",
+    description:
+      "Invita usuarios de tu empresa con roles diferenciados (Admin, Manager, Employee).",
+  },
+  {
+    icon: Calendar,
+    title: "Historial Completo",
+    description:
+      "Acceso a todo el historial de servicios, confirmaciones y pagos.",
+  },
+];
+
+const cateringFeatures: Feature[] = [
+  {
+    icon: TrendingUp,
+    title: "Panel Operacional",
+    description:
+      "Vista rápida de contratos activos, capacidad disponible y próximos servicios.",
+  },
+  {
+    icon: Calendar,
+    title: "Gestión de Servicios",
+    description:
+      "Confirma cantidades servidas y mantén un registro preciso de operaciones.",
+  },
+  {
+    icon: BarChart3,
+    title: "Control de Capacidad",
+    description:
+      "Monitorea tu capacidad diaria contra las demandas de todos tus clientes.",
+  },
+  {
+    icon: Users,
+    title: "Equipo Colaborativo",
+    description:
+      "Asigna roles y permisos a tu equipo para gestionar operaciones.",
+  },
+  {
+    icon: CheckCircle,
+    title: "Confirmaciones Automáticas",
+    description:
+      "Sistema de fallback automático si el cliente no confirma a tiempo.",
+  },
+  {
+    icon: BarChart3,
+    title: "Histórico Detallado",
+    description:
+      "Registro completo de todas las operaciones para auditoría y análisis.",
+  },
+];
 
 export default function LandingPage() {
   return (
@@ -50,9 +155,9 @@ export default function LandingPage() {
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
-            <button className="px-8 py-3 rounded-lg border border-slate-300 font-medium text-slate-900 hover:bg-slate-50 transition">
+            <Button variant="outline" size="lg">
               Conocer Más
-            </button>
+            </Button>
           </div>
         </div>
       </section>
@@ -69,58 +174,8 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-            {[
-              {
-                icon: Calendar,
-                title: "Contratación Flexible",
-                description:
-                  "Define días de servicio, cantidades y precios personalizados para cada contrato.",
-              },
-              {
-                icon: CheckCircle,
-                title: "Confirmaciones Dual",
-                description:
-                  "Confirma cantidades esperadas y controlá lo que realmente se sirve.",
-              },
-              {
-                icon: BarChart3,
-                title: "Reportes Financieros",
-                description:
-                  "Dashboard con presupuesto, gastos, KPIs y proyecciones precisas.",
-              },
-              {
-                icon: TrendingUp,
-                title: "Análisis de Desviaciones",
-                description:
-                  "Identifica diferencias entre lo presupuestado y lo consumido.",
-              },
-              {
-                icon: Users,
-                title: "Gestión de Usuarios",
-                description:
-                  "Invita usuarios de tu empresa con roles diferenciados (Admin, Manager, Employee).",
-              },
-              {
-                icon: Calendar,
-                title: "Historial Completo",
-                description:
-                  "Acceso a todo el historial de servicios, confirmaciones y pagos.",
-              },
-            ].map((feature, idx) => (
-              <Card
-                key={idx}
-                className="hover:shadow-lg transition-shadow duration-300"
-              >
-                <CardHeader>
-                  <feature.icon className="h-8 w-8 text-teal-600 mb-2" />
-                  <CardTitle className="text-lg">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="mb-20">
+            <FeatureGrid features={clientFeatures} />
           </div>
 
           <div className="text-center mb-16">
@@ -132,59 +187,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: TrendingUp,
-                title: "Panel Operacional",
-                description:
-                  "Vista rápida de contratos activos, capacidad disponible y próximos servicios.",
-              },
-              {
-                icon: Calendar,
-                title: "Gestión de Servicios",
-                description:
-                  "Confirma cantidades servidas y mantén un registro preciso de operaciones.",
-              },
-              {
-                icon: BarChart3,
-                title: "Control de Capacidad",
-                description:
-                  "Monitorea tu capacidad diaria contra las demandas de todos tus clientes.",
-              },
-              {
-                icon: Users,
-                title: "Equipo Colaborativo",
-                description:
-                  "Asigna roles y permisos a tu equipo para gestionar operaciones.",
-              },
-              {
-                icon: CheckCircle,
-                title: "Confirmaciones Automáticas",
-                description:
-                  "Sistema de fallback automático si el cliente no confirma a tiempo.",
-              },
-              {
-                icon: BarChart3,
-                title: "Histórico Detallado",
-                description:
-                  "Registro completo de todas las operaciones para auditoría y análisis.",
-              },
-            ].map((feature, idx) => (
-              <Card
-                key={idx}
-                className="hover:shadow-lg transition-shadow duration-300"
-              >
-                <CardHeader>
-                  <feature.icon className="h-8 w-8 text-teal-600 mb-2" />
-                  <CardTitle className="text-lg">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-600">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <FeatureGrid features={cateringFeatures} />
         </div>
       </section>
 

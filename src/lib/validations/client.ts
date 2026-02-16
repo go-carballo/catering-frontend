@@ -40,3 +40,17 @@ export const updateClientSchema = z.object({
 
 export type CreateClientFormData = z.infer<typeof createClientSchema>;
 export type UpdateClientFormData = z.infer<typeof updateClientSchema>;
+
+/**
+ * Unified form data type for the client form dialog.
+ * Create-only fields (email, password) are marked optional so the same
+ * type works for both create and edit modes with react-hook-form generics.
+ */
+export type ClientFormData = {
+  name: string;
+  email?: string;
+  password?: string;
+  taxId?: string;
+  workMode: WorkMode;
+  officeDays: DayOfWeek[];
+};

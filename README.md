@@ -6,11 +6,11 @@
   <img src="https://img.shields.io/badge/pnpm-9-F69220?style=flat-square&logo=pnpm" alt="pnpm">
 </p>
 
-<h1 align="center">🍽️ Catering Frontend</h1>
+<h1 align="center">🍽️ ChefOps</h1>
 
 <p align="center">
-  <strong>Sistema de gestión de catering</strong><br>
-  Aplicación web moderna para gestionar contratos, servicios y reportes de catering.
+  <strong>Sistema de gestión operacional para catering</strong><br>
+  Plataforma moderna para gestionar contratos, servicios, reportes y equipo de catering.
 </p>
 
 <p align="center">

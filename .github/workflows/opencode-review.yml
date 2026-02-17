@@ -28,10 +28,9 @@ jobs:
       - name: Run OpenCode Review
         uses: anomalyco/opencode/github@latest
         env:
-          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          model: opencode/claude-sonnet-4
+          model: github-copilot/claude-sonnet-4
           use_github_token: true
           prompt: |
             Review this pull request following the rules in AGENTS.md.

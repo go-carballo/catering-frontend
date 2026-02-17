@@ -41,6 +41,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface UserFormDialogProps {
   user?: User;
@@ -67,6 +68,7 @@ export function UserFormDialog({ user, trigger }: UserFormDialogProps) {
           email: user.email,
           name: user.name,
           role: user.role,
+          isActive: user.isActive,
         }
       : {
           email: "",
@@ -81,6 +83,7 @@ export function UserFormDialog({ user, trigger }: UserFormDialogProps) {
         email: user.email,
         name: user.name,
         role: user.role,
+        isActive: user.isActive,
       });
     }
   }, [open, user, form]);
@@ -184,6 +187,29 @@ export function UserFormDialog({ user, trigger }: UserFormDialogProps) {
                 </FormItem>
               )}
             />
+
+            {isEdit && (
+              <FormField
+                control={form.control}
+                name="isActive"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Estado Activo</FormLabel>
+                      <FormDescription>
+                        Desactiva el usuario para evitar acceso
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            )}
 
             <DialogFooter>
               <Button

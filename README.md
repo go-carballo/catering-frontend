@@ -46,8 +46,8 @@ ChefOps is a **production-grade, multi-tenant SaaS platform** for catering contr
 Complete frontend documentation for developers and evaluators:
 
 ### **Start here for thesis context:**
-- **[FRONTEND_ARCHITECTURE.md](./FRONTEND_ARCHITECTURE.md)** - System design, data flow, state management
-- **[FRONTEND_DEVELOPMENT_GUIDE.md](./FRONTEND_DEVELOPMENT_GUIDE.md)** - Setup, workflows, adding features
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System design, data flow, state management
+- **[DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md)** - Setup, workflows, adding features
 
 ### **Component & Design:**
 - **[COMPONENTS_DOCUMENTATION.md](./COMPONENTS_DOCUMENTATION.md)** - UI/Feature components, patterns, usage
@@ -96,7 +96,7 @@ Backend (REST API on Railway)
 - **Type-safe throughout** - TypeScript strict mode
 - **Component composition** - Reusable, testable UI blocks
 
-See [FRONTEND_ARCHITECTURE.md](./FRONTEND_ARCHITECTURE.md) for detailed explanation.
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed explanation.
 
 ---
 

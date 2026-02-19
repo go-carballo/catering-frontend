@@ -6,7 +6,7 @@ Welcome to the ChefOps frontend documentation. This is the UI layer of the Maste
 
 ## 📚 Start Here
 
-### [FRONTEND_ARCHITECTURE.md](../FRONTEND_ARCHITECTURE.md)
+### [ARCHITECTURE.md](../ARCHITECTURE.md)
 Deep dive into the frontend system design:
 - Next.js App Router structure and layers
 - React 19 component patterns
@@ -23,7 +23,7 @@ Deep dive into the frontend system design:
 
 ## 👨‍💻 Development
 
-### [FRONTEND_DEVELOPMENT_GUIDE.md](../FRONTEND_DEVELOPMENT_GUIDE.md)
+### [DEVELOPMENT_GUIDE.md](../DEVELOPMENT_GUIDE.md)
 Getting started and development workflows:
 - Quick start (one-command setup)
 - Prerequisites and environment setup
@@ -66,20 +66,20 @@ Development session notes and progress tracking. Documents what was implemented 
 
 ### For Thesis Evaluators
 1. Read: Main [README.md](../README.md) - Overview
-2. Understand: [FRONTEND_ARCHITECTURE.md](../FRONTEND_ARCHITECTURE.md) - Design & patterns
+2. Understand: [ARCHITECTURE.md](../ARCHITECTURE.md) - Design & patterns
 3. Dive deep: [COMPONENTS_DOCUMENTATION.md](../COMPONENTS_DOCUMENTATION.md) - Implementation details
 4. Check out: Backend [MASTER_THESIS.md](../../catering-api/MASTER_THESIS.md) - Full context
 
 ### For Developers
-1. Setup: [FRONTEND_DEVELOPMENT_GUIDE.md](../FRONTEND_DEVELOPMENT_GUIDE.md) - Get running locally
-2. Learn: [FRONTEND_ARCHITECTURE.md](../FRONTEND_ARCHITECTURE.md) - Understand the structure
+1. Setup: [DEVELOPMENT_GUIDE.md](../DEVELOPMENT_GUIDE.md) - Get running locally
+2. Learn: [ARCHITECTURE.md](../ARCHITECTURE.md) - Understand the structure
 3. Build: [COMPONENTS_DOCUMENTATION.md](../COMPONENTS_DOCUMENTATION.md) - Use existing components
-4. Code: Follow conventions in [FRONTEND_DEVELOPMENT_GUIDE.md](../FRONTEND_DEVELOPMENT_GUIDE.md) - Code style
+4. Code: Follow conventions in [DEVELOPMENT_GUIDE.md](../DEVELOPMENT_GUIDE.md) - Code style
 
 ### For DevOps/Ops
-1. Deployment: [FRONTEND_DEVELOPMENT_GUIDE.md](../FRONTEND_DEVELOPMENT_GUIDE.md#deployment) - Vercel setup
+1. Deployment: [DEVELOPMENT_GUIDE.md](../DEVELOPMENT_GUIDE.md#deployment) - Vercel setup
 2. Environment: See `.env.example` in root - API configuration
-3. Scripts: [FRONTEND_DEVELOPMENT_GUIDE.md](../FRONTEND_DEVELOPMENT_GUIDE.md#scripts) - Available commands
+3. Scripts: [DEVELOPMENT_GUIDE.md](../DEVELOPMENT_GUIDE.md#scripts) - Available commands
 4. Monitoring: Monitor Vercel dashboard for deploys and errors
 
 ---

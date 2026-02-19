@@ -46,6 +46,7 @@ ChefOps is a **production-grade, multi-tenant SaaS platform** for catering contr
 Complete frontend documentation for developers and evaluators:
 
 ### **Start here for thesis context:**
+- **[Presentation Slides](https://docs.google.com/presentation/d/1eHKellzAySouQ-5jy5Yz7KJIrdJ7_dTM8BBvapJH00o/edit?usp=sharing)** - TFM defense slides
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System design, data flow, state management
 - **[DEVELOPMENT_GUIDE.md](./DEVELOPMENT_GUIDE.md)** - Setup, workflows, adding features
 

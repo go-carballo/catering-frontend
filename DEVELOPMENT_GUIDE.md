@@ -790,7 +790,7 @@ git push origin main
 
 ```bash
 # Frontend
-https://catering-frontend-two.vercel.app
+https://chefops.vercel.app
 
 # Swagger docs
 https://catering-api-production.up.railway.app/docs

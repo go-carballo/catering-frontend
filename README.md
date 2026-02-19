@@ -250,7 +250,7 @@ gga install
 
 ### Production
 
-- **Frontend:** [https://catering-frontend-two.vercel.app](https://catering-frontend-two.vercel.app)
+- **Frontend:** [https://chefops.vercel.app](https://chefops.vercel.app)
 - **Backend API:** [https://catering-api-production.up.railway.app/api](https://catering-api-production.up.railway.app/api)
 - **API Docs (Swagger):** [https://catering-api-production.up.railway.app/docs](https://catering-api-production.up.railway.app/docs)
 

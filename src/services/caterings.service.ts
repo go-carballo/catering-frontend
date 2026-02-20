@@ -6,7 +6,7 @@ export interface Catering {
   email: string;
   taxId: string | null;
   dailyCapacity: number;
-  isActive: boolean;
+  status: "ACTIVE" | "INACTIVE";
   createdAt: string;
   updatedAt: string;
 }

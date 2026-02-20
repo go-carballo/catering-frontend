@@ -10,7 +10,7 @@ export interface Client {
   taxId: string | null;
   workMode: WorkMode;
   officeDays: DayOfWeek[];
-  isActive: boolean;
+  status: "ACTIVE" | "INACTIVE";
   createdAt: string;
   updatedAt: string;
 }

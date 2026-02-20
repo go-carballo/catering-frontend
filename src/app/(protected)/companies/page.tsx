@@ -122,12 +122,12 @@ export default function CompaniesPage() {
                         <TableCell className="text-center">
                           <Badge
                             className={
-                              catering.isActive
+                              catering.status === "ACTIVE"
                                 ? "bg-green-100 text-green-800"
                                 : "bg-red-100 text-red-800"
                             }
                           >
-                            {catering.isActive ? "Activo" : "Inactivo"}
+                            {catering.status === "ACTIVE" ? "Activo" : "Inactivo"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
@@ -212,12 +212,12 @@ export default function CompaniesPage() {
                         <TableCell className="text-center">
                           <Badge
                             className={
-                              client.isActive
+                              client.status === "ACTIVE"
                                 ? "bg-green-100 text-green-800"
                                 : "bg-red-100 text-red-800"
                             }
                           >
-                            {client.isActive ? "Activo" : "Inactivo"}
+                            {client.status === "ACTIVE" ? "Activo" : "Inactivo"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">

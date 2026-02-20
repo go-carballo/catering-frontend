@@ -23,6 +23,7 @@ export interface UpdateCateringDto {
   name?: string;
   taxId?: string;
   dailyCapacity?: number;
+  status?: "ACTIVE" | "INACTIVE";
 }
 
 export const cateringsService = {

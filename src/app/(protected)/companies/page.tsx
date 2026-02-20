@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Power } from "lucide-react";
 
 import {
   useCaterings,
-  useDeleteCatering,
+  useUpdateCatering,
   useClients,
-  useDeleteClient,
+  useUpdateClient,
 } from "@/hooks";
 import { CateringFormDialog } from "@/components/companies/catering-form-dialog";
 import { ClientFormDialog } from "@/components/companies/client-form-dialog";
@@ -44,27 +44,32 @@ import { Badge } from "@/components/ui/badge";
 export default function CompaniesPage() {
   const { data: caterings, isLoading: isLoadingCaterings } = useCaterings();
   const { data: clients, isLoading: isLoadingClients } = useClients();
-  const deleteCateringMutation = useDeleteCatering();
-  const deleteClientMutation = useDeleteClient();
+  const updateCateringMutation = useUpdateCatering();
+  const updateClientMutation = useUpdateClient();
 
-  const [deleteDialog, setDeleteDialog] = useState<{
+  const [toggleDialog, setToggleDialog] = useState<{
     open: boolean;
     type: "catering" | "client" | null;
     id: string | null;
     name: string | null;
-  }>({ open: false, type: null, id: null, name: null });
+    currentStatus: "ACTIVE" | "INACTIVE" | null;
+  }>({ open: false, type: null, id: null, name: null, currentStatus: null });
 
-  const handleDelete = () => {
-    if (!deleteDialog.id || !deleteDialog.type) return;
+  const handleToggleStatus = () => {
+    if (!toggleDialog.id || !toggleDialog.type || !toggleDialog.currentStatus) return;
 
-    if (deleteDialog.type === "catering") {
-      deleteCateringMutation.mutate(deleteDialog.id);
+    const newStatus = toggleDialog.currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+
+    if (toggleDialog.type === "catering") {
+      updateCateringMutation.mutate({ id: toggleDialog.id, dto: { status: newStatus } });
     } else {
-      deleteClientMutation.mutate(deleteDialog.id);
+      updateClientMutation.mutate({ id: toggleDialog.id, dto: { status: newStatus } });
     }
 
-    setDeleteDialog({ open: false, type: null, id: null, name: null });
+    setToggleDialog({ open: false, type: null, id: null, name: null, currentStatus: null });
   };
+
+  const isActivating = toggleDialog.currentStatus === "INACTIVE";
 
    return (
      <div className="space-y-6">
@@ -135,7 +140,7 @@ export default function CompaniesPage() {
                             <CateringFormDialog
                               catering={catering}
                               trigger={
-                                <Button size="sm" variant="ghost">
+                                <Button size="sm" variant="ghost" aria-label="Editar">
                                   <Pencil className="h-4 w-4" />
                                 </Button>
                               }
@@ -143,17 +148,23 @@ export default function CompaniesPage() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="text-red-600 hover:text-red-700"
+                              className={
+                                catering.status === "ACTIVE"
+                                  ? "text-red-600 hover:text-red-700"
+                                  : "text-green-600 hover:text-green-700"
+                              }
+                              aria-label={catering.status === "ACTIVE" ? "Desactivar" : "Activar"}
                               onClick={() =>
-                                setDeleteDialog({
+                                setToggleDialog({
                                   open: true,
                                   type: "catering",
                                   id: catering.id,
                                   name: catering.name,
+                                  currentStatus: catering.status,
                                 })
                               }
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Power className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>
@@ -225,7 +236,7 @@ export default function CompaniesPage() {
                             <ClientFormDialog
                               client={client}
                               trigger={
-                                <Button size="sm" variant="ghost">
+                                <Button size="sm" variant="ghost" aria-label="Editar">
                                   <Pencil className="h-4 w-4" />
                                 </Button>
                               }
@@ -233,17 +244,23 @@ export default function CompaniesPage() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="text-red-600 hover:text-red-700"
+                              className={
+                                client.status === "ACTIVE"
+                                  ? "text-red-600 hover:text-red-700"
+                                  : "text-green-600 hover:text-green-700"
+                              }
+                              aria-label={client.status === "ACTIVE" ? "Desactivar" : "Activar"}
                               onClick={() =>
-                                setDeleteDialog({
+                                setToggleDialog({
                                   open: true,
                                   type: "client",
                                   id: client.id,
                                   name: client.name,
+                                  currentStatus: client.status,
                                 })
                               }
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Power className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>
@@ -257,23 +274,25 @@ export default function CompaniesPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialog.open} onOpenChange={(open) => !open && setDeleteDialog({ open: false, type: null, id: null, name: null })}>
+      {/* Toggle Status Confirmation Dialog */}
+      <AlertDialog open={toggleDialog.open} onOpenChange={(open) => !open && setToggleDialog({ open: false, type: null, id: null, name: null, currentStatus: null })}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esto desactivará {deleteDialog.type === "catering" ? "el catering" : "el cliente"}{" "}
-              <strong>{deleteDialog.name}</strong>. Los contratos existentes no se verán afectados.
+              {isActivating
+                ? <>Esto activará {toggleDialog.type === "catering" ? "el catering" : "el cliente"}{" "}<strong>{toggleDialog.name}</strong>.</>
+                : <>Esto desactivará {toggleDialog.type === "catering" ? "el catering" : "el cliente"}{" "}<strong>{toggleDialog.name}</strong>. Los contratos existentes no se verán afectados.</>
+              }
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700"
+              onClick={handleToggleStatus}
+              className={isActivating ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}
             >
-              Desactivar
+              {isActivating ? "Activar" : "Desactivar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

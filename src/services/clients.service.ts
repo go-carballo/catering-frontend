@@ -29,6 +29,7 @@ export interface UpdateClientDto {
   taxId?: string;
   workMode?: WorkMode;
   officeDays?: DayOfWeek[];
+  status?: "ACTIVE" | "INACTIVE";
 }
 
 export const clientsService = {
